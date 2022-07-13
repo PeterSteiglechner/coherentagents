@@ -11,7 +11,9 @@ rm(list=ls())
 library(readr)
 library(tidyverse)
 library(RCA)
+library(dplyr)
 library(corrplot)
+library(abind)
 
 # Loading and cleaning data -----------------------------------------------
 raw = read_csv('ESS9e03_1.csv')
@@ -23,7 +25,7 @@ attitudenames = c("freehms", "gincdif", "lrscale", "impcntr", "euftf")
 # v' = -1 + 2 * (v-m)/(M-m), where m is the lowest, M the highest possible answer
 df <-  raw  %>% 
   filter(agea<=110)  %>% 
-  select(idno,cntry, all_of(attitudenames)) %>% 
+  dplyr::select(idno,cntry, all_of(attitudenames)) %>% 
   # Filtering the cases -- cases with missing values on believes variables deleted:
   filter(freehms <= 5, gincdif <= 5, impcntr <= 4, 
          lrscale <= 10, euftf <= 10)%>%
@@ -58,11 +60,41 @@ df_country_bel_reduced <- df_country_bel |>
   filter(group<=6)
 
 # Calculate and plot correlation matrices
-par(mfrow=c(1,6))
+par(mfrow=c(2,3))
 for (i in 1:6){
   matrix <- df_country_bel_reduced |> filter(group == i) |> 
-  select(attitudenames) |>  cor() 
+  dplyr::select(attitudenames) |>  cor() 
   matrix |> corrplot(method='number',title=paste("RCAgroup", i), mar=c(0,0,1,0))
 }
 
+
+
+
+# THINGS TO PLOT:
+# plot(rcagroups, module = 1, heat_labels = T)
+# plot(rcagroups, module = 2, heat_labels = T)
+# plot(rcagroups, module = 3, heat_labels = T)
+# plot(rcagroups, module = 4, heat_labels = T)
+# plot(rcagroups, module = 5, heat_labels = T)
+# plot(rcagroups, module = 6, heatmap=F, margin = 0.5, vertex_five_size = 40)
+# plot(rcagroups, module = 2, heatmap=F, margin = 0.5, vertex_five_size = 40)
+# summary(rcagroups)
+# plot(rcagroups, module = 1, heatmap=F, margin = 0.5, vertex_five_size = 40, layout = layout.circle)
+# plot(rcagroups, module = 2, heatmap=F, margin = 0.5, vertex_five_size = 40, layout = layout.circle)
+# plot(rcagroups, module = 3, heatmap=F, margin = 0.5, vertex_five_size = 40, layout = layout.circle)
+# plot(rcagroups, module = 4, heatmap=F, margin = 0.5, vertex_five_size = 40, layout = layout.circle)
+# plot(rcagroups, module = 5, heatmap=F, margin = 0.5, vertex_five_size = 40, layout = layout.circle)
+# plot(rcagroups, module = 6, heatmap=F, margin = 0.5, vertex_five_size = 40, layout = layout.circle)
+# print(rcagroups)
+
+# #beliefs
+# ggplot(dfgRCA, aes(x=group, y=freehms)) + geom_boxplot()
+# ggplot(dfgRCA, aes(x=group, y=gincdif)) + geom_boxplot()
+# ggplot(dfgRCA, aes(x=group, y=impcntr)) + geom_boxplot()
+# ggplot(dfgRCA, aes(x=group, y=lrscale)) + geom_boxplot()
+# ggplot(dfgRCA, aes(x=group, y=euftf)) + geom_boxplot()
+
+# df_bel |> mutate(group = rcagroups$membership) |> 
+#   pivot_longer(attitudenames) |>
+#   ggplot(aes(value)) + geom_histogram() + facet_wrap(name~group, ncol=9)
 
