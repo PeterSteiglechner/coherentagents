@@ -12,6 +12,7 @@ library(readr)
 library(tidyverse)
 library(RCA)
 library(dplyr)
+library(abind)
 library(corrplot)
 
 # Loading and cleaning data -----------------------------------------------
@@ -55,11 +56,51 @@ table(df_country$prtclede)
 
 # Calculate and plot correlation matrices
 parties = c("CDUCSU", "SPD", "Left", "Green", "FDP", "AfD")
-par(mfrow=c(1,length(parties)))
+par(mfrow=c(2,0.5*length(parties)))
 for (j in 1:length(parties)) {
   matrix <- df_country |> filter(prtclede==j) |> 
     dplyr::select(attitudenames) |>  cor() 
   matrix |> corrplot(method='number',title=paste(parties[j]), mar=c(0,0,1,0))
 }
+
+#########################################
+####    Evaluate Goodness of Fit    #####
+#########################################
+groupname=3
+group = df_country |>  filter(prtclede==groupname)
+grouping_r <- group |> select(attitudenames)  |> cor()
+n_group = nrow(group)
+a = list()
+for (i in 1:1000){
+  sample_group <- df_country[sample(nrow(df_country), n_group), ]
+  sample_r <- sample_group|> select(attitudenames)  |> cor()
+  a[[i]] <- data.frame(sample_r)
+}
+all_rs <- abind(a, along = 3)
+# now plot hist of all_rs[i,j,] and line in grouping[i,j]
+# create list to access Dimensions in lapply
+dims <- list(row = rep(1:nrow(all_rs),each = ncol(all_rs)),
+             col = rep(1:ncol(all_rs),times = nrow(all_rs)))
+xlimval=1.05
+plots <- lapply(seq_along(dims$row),
+                function(i){ 
+                  if (dims$row[i]<dims$col[i]) {
+                    randvalues = all_rs[dims$row[i],dims$col[i],]
+                    randmean = mean(randvalues)
+                    randsd = sd(randvalues)
+                    group_r = grouping_r[dims$row[i],dims$col[i]]
+                    if (abs(group_r-randmean) <= 2*randsd){col="red"}else{col="green"}
+                    ggplot(data.frame(x = randvalues),aes(x = x)) +
+                      geom_histogram(binwidth=0.01)+ 
+                      xlim(-xlimval, xlimval) + 
+                      geom_vline(xintercept=group_r, colour=col)+
+                      theme_minimal()+
+                      labs(title = paste(attitudenames[dims$row[i]],'-',attitudenames[dims$col[i]]))+
+                      xlab(paste("r_", dims$row[i], dims$col[i], " = ", format(grouping_r[dims$row[i],dims$col[i]], digits=3), sep=""))+
+                      ylab("")
+                  }
+                })
+plot_grid(plotlist = plots, ncol = 5) 
+
 
 
