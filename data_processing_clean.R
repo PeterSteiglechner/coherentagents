@@ -79,7 +79,7 @@ items <- read_csv("PL/items.csv")
 attitudenames = c("freehms", "gincdif", "lrscale", "impcntr", "euftf")
 ## Item distributions general 
 items |> pivot_longer(attitudenames) |> 
-  ggplot(aes(value)) + geom_histogram(bins = 30) + facet_wrap(~name) + theme_bw()
+  ggplot(aes(value)) + geom_histogram(bins = 30) + facet_wrap(~name, nrow = 1) + theme_bw()
 ## Data Visualization of RCA Groups' item characteristics
 ### Groups' item distributions
 items |> filter(!cluster_exclusion) |> pivot_longer(all_of(attitudenames)) |>
@@ -105,8 +105,7 @@ library(correlation)
 library(GGally)
 items |> select(attitudenames) |> correlation()
 items |> select(attitudenames) |> ggcorr()
-items |> select(attitudenames) |> cor()
-
+items |> select(attitudenames) |> cor() |> corrplot(method='number')
 
 
 
