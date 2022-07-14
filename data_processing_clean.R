@@ -23,17 +23,16 @@ rm(list=ls())
 
 
 # Loading packages:
-library(readr)
-library(tibble)
-library(dplyr)
-library(forcats)
-library(writexl)
+library(readr) #
+library(tibble) #
+library(dplyr) #
+library(forcats) #
+library(writexl) #
 library(corrplot) 
-library(ggplot2)
+library(ggplot2) #
 library(tidyverse)
 library(RCA)
 library(igraph)
-library(ggplot2)
 
 ####BEFORE Pushing: remove dplyr before select
 
@@ -69,78 +68,58 @@ dfsel <- dffull %>%
 # filter out COUNTRY 
 ##(ADD variable name instead of DE here)
 
-country_name = "DE"
 
-dffull_g = dffull   |> 
-  filter(cntry==country_name)
-dfsel_g = dfsel |> 
-  filter(cntry==country_name)
-
-#Assigning groups of values to variables
-attitudenames = c("freehms", "gincdif", "lrscale", "impcntr", "euftf")
-columns = append(attitudenames, "idno", after=0)
-
-### RCA:
-
-# NOTE: use dfsel_g for country-specific data or dffull for whole 
-
-df_bel <- dfsel_g[columns]
-
-#x <- RCA(df_bel, alpha = 0.01)
-#print(x)
-x_five <- RCA(df_bel[attitudenames])
-df_bel$group <- x_five$membership
-
-#Removing modules/clusters with too few members:
-
-num_mod_og <- max(x_five$membership) #total number of modules/groups
-
-table_mod <- as.data.frame(
-  table(x_five$membership)
-)
-
-remove_var <- table_mod |>
-  filter(Freq < 10) #Set required member size of a group
-
-  
-remove_list = as.numeric(remove_var$Var1)
-
-remove_list
-
-df_bel_filt <- df_bel[ ! df_bel$group %in% remove_list, ]
-
-
-num_mod <- n_distinct(df_bel_filt$group) #total number of clustered in filtered version
-
-
-#Plotting heat maps and network plots of the RCA 
-
-clust_num_list <- unique(c(as.numeric(df_bel_filt$group))) #list of unique module/cluster numbers
-
-for (i in clust_num_list) {
-  plot(x_five, module = i, heat_labels = T)
+appendRCAgroups <- function(df, attitudenames = c("freehms", "gincdif", "lrscale", "impcntr", "euftf"), country_name = "DE") { 
+  x_five <- df |> filter(cntry==country_name) |> select(attitudenames) |> RCA()
+  df |> filter(cntry==country_name) |> select(idno, attitudenames)  |> mutate(group = x_five$membership)
 }
 
-for (i in clust_num_list) {
-  plot(x_five, module = i, heatmap=F, margin = 0.5, vertex_five_size = 40, layout= layout.circle)
-} #Don't know if we even need these plots really
-
-
-# Trying to generate the correlational plot:
- 
-df_matrix <- data.frame()
-
-for (i in clust_num_list) {
-  df_matrix_temp <- 
-    df_bel_filt |> filter(group == i) |> 
-    dplyr::select(attitudenames) |>  
-    cor() |> 
-    as.data.frame() |> 
-    mutate (item = attitudenames) |>
-    mutate(group = i)
-  
-  df_matrix <- rbind(df_matrix, df_matrix_temp, make.row.names=F)
+checkClusters <- function (df) {
+  std <- df |> group_by(group) |> summarise(across(attitudenames, .fns = sd))
+  std$deviation <- std$freehms * std$gincdif * std$lrscale * std$impcntr * std$euftf
+  std$cluster_exclusion <- ifelse(std$deviation == 0,T,F)
+  df |> left_join(std[, c("cluster_exclusion", "group")], by="group")
 }
 
-write.csv (df_matrix, 'Correlationmatrix_clean.csv')
+
+computeCorrelationsPerGroup <- function(df) {
+  
+  df <- df |> filter(cluster_exclusion==F)
+  df_matrix <- data.frame()
+  
+  for (i in unique(df$group)) {
+    df_matrix_temp <- 
+      df |> filter(group == i) |> 
+      dplyr::select(attitudenames) |>  
+      cor() |> 
+      as.data.frame() |> 
+      mutate (item = attitudenames) |>
+      mutate(group = i)
+    
+    df_matrix <- rbind(df_matrix, df_matrix_temp, make.row.names=F)
+   }
+ df_matrix 
+}
+
+
+writeForABM <- function(df,country_name) {
+  items <- appendRCAgroups(df)
+  items <- checkClusters(items)
+  correlations <- computeCorrelationsPerGroup(items)
+  if (!dir.exists(country_name)) {
+    dir.create(country_name)
+  } 
+  write_csv(items, paste0(country_name,"/items.csv"))
+  write_csv(correlations, paste0(country_name,"/correlations.csv"))
+}
+
+writeForABM(dffull, "DE")
+
+#### THINGS TO DO LATER:
+
+#PLOT:
+
+#for (i in clust_num_list) {
+# plot(x_five, module = i, heat_labels = T)
+#}
 
