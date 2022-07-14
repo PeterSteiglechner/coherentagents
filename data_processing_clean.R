@@ -5,10 +5,9 @@
 
 
 ## NOTES:
-# 1) selection and filtering is done -- we have 26 vars (21 human values, 5 believes),
-#  we have 2,126 observations, i.e. respondents which answer all our 26 questions!
-#
-# 2) generating of frequency table is not neat -- we might rewrite in more concise way,
+# Steps taken:
+# 1) Filtering missing values for the five beliefs we're interested in 
+# 2) Scaling values on a -1 to +1 scale
 #  'rstatix' package, or 'sjmisc' package might help here (Jan would love 'sjmisc', it mimics STATA!)
 #
 # 3) scaling of the values and finding correlations is done
@@ -21,15 +20,8 @@
 # cleaning the environment:
 rm(list=ls())
 
-
 # Loading packages:
-library(readr) #
-library(tibble) #
-library(dplyr) #
-library(forcats) #
-library(writexl) #
 library(corrplot) 
-library(ggplot2) #
 library(tidyverse)
 library(RCA)
 library(igraph)
@@ -74,7 +66,7 @@ appendRCAgroups <- function(df, attitudenames = c("freehms", "gincdif", "lrscale
   df |> filter(cntry==country_name) |> select(idno, attitudenames)  |> mutate(group = x_five$membership)
 }
 
-checkClusters <- function (df) {
+checkClusters <- function (df, attitudenames = c("freehms", "gincdif", "lrscale", "impcntr", "euftf")) {
   std <- df |> group_by(group) |> summarise(across(attitudenames, .fns = sd))
   std$deviation <- std$freehms * std$gincdif * std$lrscale * std$impcntr * std$euftf
   std$cluster_exclusion <- ifelse(std$deviation == 0,T,F)
@@ -82,7 +74,7 @@ checkClusters <- function (df) {
 }
 
 
-computeCorrelationsPerGroup <- function(df) {
+computeCorrelationsPerGroup <- function(df, attitudenames = c("freehms", "gincdif", "lrscale", "impcntr", "euftf")) {
   
   df <- df |> filter(cluster_exclusion==F)
   df_matrix <- data.frame()
@@ -112,6 +104,8 @@ writeForABM <- function(df,country_name) {
   write_csv(items, paste0(country_name,"/items.csv"))
   write_csv(correlations, paste0(country_name,"/correlations.csv"))
 }
+
+
 
 writeForABM(dffull, "DE")
 
