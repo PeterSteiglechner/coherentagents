@@ -6,11 +6,14 @@ rm(list=ls())
 library(corrplot) 
 library(tidyverse)
 library(RCA)
+library(corclass)
 library(igraph)
 
 # Data Preparation
 
 ## Loading 
+# Download the full dataset of the ESS Wave 9 (2018) 
+# from http://doi.org/10.21338/NSD-ESS9-2018 in csv format
 raw = read_csv('ESS9e03_1.csv') # Use this to select other context variables later
 
 ## Transform attitude items and calculate correlations
@@ -29,8 +32,11 @@ dffull <-  raw %>%
     across(c(freehms, gincdif, impcntr), ~ .x * -1)
   )
 
-appendRCAgroups <- function(df, attitudenames = c("freehms", "gincdif", "lrscale", "impcntr", "euftf"), country_name) { 
-  x_five <- df |> filter(cntry==country_name) |> select(attitudenames) |> RCA()
+appendGroups <- function(df, attitudenames = c("freehms", "gincdif", "lrscale", "impcntr", "euftf"), 
+                         country_name, method = "cca") { 
+  # method can be "RCA" or "cca" (or any method which delivers a membership variable)
+  x_five <- df |> filter(cntry==country_name) |> select(attitudenames) |> 
+    list() |> do.call(method, args = _)
   df |> filter(cntry==country_name) |> select(idno, attitudenames)  |> mutate(group = x_five$membership)
 }
 
@@ -55,8 +61,9 @@ computeCorrelationsPerGroup <- function(df, attitudenames = c("freehms", "gincdi
  df_matrix
 }
 
-writeForABM <- function(df, attitudenames, country_name) {
-  items <- appendRCAgroups(df, attitudenames = attitudenames, country_name = country_name)
+writeForABM <- function(df, attitudenames, country_name, groupingMethod, method = "cca") {
+  items <- appendGroups(dffull, attitudenames = attitudenames, 
+                        country_name = country_name, method = method)
   items <- checkGroups(items)
   correlations <- computeCorrelationsPerGroup(items)
   if (!dir.exists(country_name)) {
@@ -68,9 +75,8 @@ writeForABM <- function(df, attitudenames, country_name) {
 
 ## Write out items.csv and correlations.csv for different countries
 attitudenames = c("freehms", "gincdif", "lrscale", "impcntr", "euftf")
-writeForABM(dffull, attitudenames, country_name = "DE") # Takes time because of RCA!
-writeForABM(dffull, attitudenames, country_name = "NL") # Takes time because of RCA!
-writeForABM(dffull, attitudenames, country_name = "PL") # Takes time because of RCA!
+writeForABM(dffull, attitudenames, country_name = "DE", method = "cca") # Takes time because of RCA!
+writeForABM(dffull, attitudenames, country_name = "PL", method = "cca") # Takes time because of RCA!
 
 
 
