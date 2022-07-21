@@ -90,7 +90,7 @@ to initialize-globals
       let j 1  ;; index of line inside the matrix we create now
       let l []
       while [j <= 5][  ;; now we know that we use 5 values, that our matrix is 5x5
-        let fl (butfirst (butlast (butlast (csv:from-row file-read-line))))   ;; also hardcoded: We know that we do not use for consistence matrix the first one and last two values
+        let fl (butlast (butlast (csv:from-row file-read-line)))   ;; also hardcoded: We know that we do not use for consistence matrix the first one and last two values
         let flp []
         foreach (fl) [[nx] -> set flp lput (precision (nx) 3) flp ]  ;; just rounding to 3 decimal places, to make matrices better readable
         set l lput flp l
