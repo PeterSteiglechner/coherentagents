@@ -1,6 +1,6 @@
 ;;;;; Model using coherence agents -- written from scratch
 
-;; Updated: 2022-07-12 FranCesko
+;; Updated: 2022-07-22 FranCesko
 
 ;; Brief idea:
 ;; -----------
@@ -157,7 +157,7 @@ to set-agents
     set_agents = "OWN" [
       file-close
       file-open agents_name
-      set N file-read
+      ;set N file-read
       print (word "File describes " N " agents using these variables:\n" file-read-line)
       (foreach (shuffle sort turtles) [ [t] ->
         ask t [
@@ -531,7 +531,7 @@ CHOOSER
 set_agents
 set_agents
 "random" "OWN"
-0
+1
 
 INPUTBOX
 715
@@ -563,7 +563,7 @@ CHOOSER
 k
 k
 1 2 3 4 5 10 20 100
-5
+6
 
 SLIDER
 715
@@ -634,7 +634,7 @@ kappa
 kappa
 0
 1
-0.01
+0.0
 0.01
 1
 NIL
@@ -649,7 +649,7 @@ gamma
 gamma
 0
 1
-0.3
+0.0
 0.05
 1
 NIL
@@ -679,7 +679,7 @@ y_belief
 y_belief
 1
 5
-4.0
+3.0
 1
 1
 NIL

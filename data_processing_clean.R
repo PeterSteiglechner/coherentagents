@@ -69,7 +69,7 @@ writeForABM <- function(df, attitudenames, country_name, groupingMethod, method 
   if (!dir.exists(country_name)) {
     dir.create(country_name)
   } 
-  write_csv(items, paste0(country_name,"/items.csv"))
+  write_csv((items %>% select(-cluster_exclusion)), paste0(country_name,"/items.csv"))
   write_csv(correlations, paste0(country_name,"/correlations.csv"))
 }
 
