@@ -29,6 +29,9 @@ globals [coherency_matrices]
 to setup
 ;- Clear everything: DONE!
   ca
+  file-close  ; Just for sure that no files are open from the previous run of model
+  file-close
+  file-close
 
 ;- Setting random seed
   if set_seed [random-seed RS]
@@ -60,25 +63,15 @@ end
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 to initialize-globals
-  ;; Now, there is only one global: coherency_matrices, let's initialize it as table!
+  ;; First of all, we have to set correct N according the length of 'items.csv',
+  ;; BUT only in the case we use our OWN data for agents, ie., agents beliefs are not random.
+  ;; If agents are initialized in random fashion, then we let N as it is.
+  if set_agents = "OWN" [set N file-length (agents_name)]
+
+  ;; Now, there is only one global to be read from file: coherency_matrices, let's initialize it as table!
   set coherency_matrices table:make
 
-
-;; Following code is just for testing use, now commented out, later we will erase it.
-;  let i  1
-;  while [i <= 6][
-;    let j 1
-;    let l []
-;    while [j <= 5][
-;      set l lput (n-values 5 [precision (1 - random-float 2) 2]) l
-;      set j j + 1
-;    ]
-;    let m matrix:from-row-list l
-;    table:put coherency_matrices i m
-;    set i  i + 1
-;  ]
-
-
+  ;; Checking existency of .csv file with coherency matrices and in case of existence, reading matrices from file.
   ifelse file-exists? coherence_name [
     file-close
     file-open coherence_name
@@ -92,6 +85,7 @@ to initialize-globals
       while [j <= 5][  ;; now we know that we use 5 values, that our matrix is 5x5
         let fl (butlast (butlast (csv:from-row file-read-line)))   ;; also hardcoded: We know that we do not use for consistence matrix the first one and last two values
         let flp []
+
         foreach (fl) [[nx] -> set flp lput (precision (nx) 3) flp ]  ;; just rounding to 3 decimal places, to make matrices better readable
         set l lput flp l
         set j j + 1
@@ -106,6 +100,30 @@ to initialize-globals
     ;; Checking how table with coherency matrices look like.
     print coherency_matrices
 end
+
+to-report file-length [file-name]
+  ;; Opening the file for counting lines
+  file-open file-name
+
+  ;; Initializing counter.
+  ;; Note! We initialize it as -1, because we want to know the number of agents,
+  ;; not number of lines, so we do not count:
+  ;;   a) the first line with variable names and
+  ;;   b) the last line with just end of the file mark,
+  ;; that's why we must start with -1, to omit 2 rows from counting
+  ;; (the first with var names and the last almost empty just with file-end mark)
+  let l -1
+
+  ;; Main WHILE cycle going through the file and counting lines
+  while [not file-at-end?][
+    let just-throw-it-away file-read-line
+    set l (l + 1)
+  ]
+
+  ;; Reportin the length of file
+  report l
+end
+
 
 to initialize-comm-network
   ;; Which kind of network we are for?
@@ -157,7 +175,6 @@ to set-agents
     set_agents = "OWN" [
       file-close
       file-open agents_name
-      ;set N file-read
       print (word "File describes " N " agents using these variables:\n" file-read-line)
       (foreach (shuffle sort turtles) [ [t] ->
         ask t [
@@ -418,7 +435,7 @@ N
 N
 10
 5000
-2201.0
+2203.0
 1
 1
 NIL
@@ -664,7 +681,7 @@ x_belief
 x_belief
 1
 5
-2.0
+3.0
 1
 1
 NIL
@@ -679,7 +696,7 @@ y_belief
 y_belief
 1
 5
-3.0
+5.0
 1
 1
 NIL
