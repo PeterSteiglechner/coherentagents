@@ -120,6 +120,9 @@ to-report file-length [file-name]
     set l (l + 1)
   ]
 
+  ;; closing file
+  file-close
+
   ;; Reportin the length of file
   report l
 end
@@ -491,7 +494,7 @@ clustering_exponent
 clustering_exponent
 0.01
 10
-0.01
+0.02
 0.01
 1
 NIL
@@ -580,7 +583,7 @@ CHOOSER
 k
 k
 1 2 3 4 5 10 20 100
-6
+5
 
 SLIDER
 715
@@ -636,7 +639,7 @@ beta
 beta
 0
 1
-0.1
+0.9
 0.05
 1
 NIL
