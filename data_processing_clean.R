@@ -77,6 +77,7 @@ writeForABM <- function(df, attitudenames, country_name, groupingMethod, method 
 attitudenames = c("freehms", "gincdif", "lrscale", "impcntr", "euftf")
 writeForABM(dffull, attitudenames, country_name = "DE", method = "cca") # Takes time because of RCA!
 writeForABM(dffull, attitudenames, country_name = "PL", method = "cca") # Takes time because of RCA!
+writeForABM(dffull, attitudenames, country_name = "CZ", method = "cca") # Takes time because of RCA!
 
 
 
