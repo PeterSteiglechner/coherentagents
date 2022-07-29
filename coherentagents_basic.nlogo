@@ -1,6 +1,6 @@
 ;;;;; Model using coherence agents -- written from scratch
 
-;; Updated: 2022-07-22 FranCesko
+;; Updated: 2022-07-29 FranCesko
 
 ;; Brief idea:
 ;; -----------
@@ -123,7 +123,7 @@ to-report file-length [file-name]
   ;; closing file
   file-close
 
-  ;; Reportin the length of file
+  ;; Reporting the length of file
   report l
 end
 
@@ -279,17 +279,6 @@ to be-socially-influenced
       ask myself [die]
     ]
   ]
-end
-
-to-report euclid [one second]
-  let l 0
-  let distances []
-  while [l < length(one)] [
-    set distances lput (((item l one) - (item l second)) ^ 2) distances
-    set l l + 1
-  ]
-  ;if (sqrt(sum(distances)) / sqrt(length(distances))) > belief_distance_treshold [print (sqrt(sum(distances)) / sqrt(length(distances)))]
-  report (sqrt(sum(distances)) / sqrt(length(distances)))
 end
 
 
@@ -594,7 +583,7 @@ conformity_tendency
 conformity_tendency
 0
 1
-0.5
+0.1
 0.05
 1
 NIL
@@ -616,27 +605,12 @@ NIL
 HORIZONTAL
 
 SLIDER
-935
-209
-1107
-242
+973
+143
+1145
+176
 alpha
 alpha
-0
-1
-0.1
-0.05
-1
-NIL
-HORIZONTAL
-
-SLIDER
-936
-247
-1108
-280
-beta
-beta
 0
 1
 0.9
@@ -646,30 +620,45 @@ NIL
 HORIZONTAL
 
 SLIDER
-937
-313
-1109
-346
+974
+181
+1146
+214
+beta
+beta
+0
+1
+0.1
+0.05
+1
+NIL
+HORIZONTAL
+
+SLIDER
+975
+247
+1147
+280
 kappa
 kappa
 0
 1
-0.0
+0.01
 0.01
 1
 NIL
 HORIZONTAL
 
 SLIDER
-936
-279
-1108
-312
+974
+213
+1146
+246
 gamma
 gamma
 0
 1
-0.0
+0.1
 0.05
 1
 NIL
@@ -752,6 +741,24 @@ RS
 1
 0
 Number
+
+PLOT
+715
+281
+1457
+519
+Links development
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"links" 1.0 0 -16777216 true "" "plot count links"
 
 @#$#@#$#@
 ## Files needed for the correct run of model:
