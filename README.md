@@ -13,4 +13,3 @@ Model development:
 Use the model coherentagents_basics.nlogo to start a new verion and call it coherentagents_{NAMEorVERSION}.nlogo
 git merging on nlogo-files is not advisable. 
 
-...Test to see if I can make changes...
