@@ -70,13 +70,12 @@ to initialize-globals
 
   ;; read in some agent globals
   ifelse file-exists? agent_data  [
-    file-close
+    set num_agents file-length (agent_data)  ;; Counting number of rows with data on agents
     file-open agent_data
-    set num_agents first csv:from-row file-read-line
     set item_labels but-first but-last csv:from-row file-read-line
     set num_items length item_labels
     clear-output
-    output-print (word "File describes " num_agents " agents using " num_items " variables:\n   " item_labels)
+    output-print (word "File '" agent_data "' describes " num_agents " agents using " num_items " variables:\n   " item_labels)
     file-close
   ] [
     error (word "agents_name file (" agent_data ") does not exist!")
@@ -86,15 +85,14 @@ to initialize-globals
   ifelse file-exists? corol_mat_file [
     file-close
     file-open corol_mat_file
-    let coh_item_labels but-first but-last but-last csv:from-row file-read-line
+    let coh_item_labels but-last but-last csv:from-row file-read-line
     if item_labels != coh_item_labels [error (word "Item labels in " agent_data  " " item_labels ", and " corol_mat_file " " coh_item_labels " are not the same!")]
-    ;; print "TEST!!!!"
     let i 1  ;; index of group/coherence matrix
     while [not file-at-end?] [
       let j 1  ;; index of line inside the matrix we create now
       let l []
       while [j <= num_items][  ;;
-        let fl (but-first (but-last (but-last (csv:from-row file-read-line))))   ;; also hardcoded: We know that we do not use for consistence matrix the first one and last two values
+        let fl (but-last (but-last (csv:from-row file-read-line)))   ;; also hardcoded: We know that we do not use for consistence matrix the last two values
         let flp []
         foreach (fl) [[nx] -> set flp lput (precision (nx) 3) flp ]  ;; just rounding to 3 decimal places, to make matrices more readable
         set l lput flp l
@@ -212,8 +210,7 @@ to initialize-agents
     file-close
     file-open agent_data
     let line file-read-line
-    set line file-read-line
-    ;; show line
+    ;show line
     (foreach (sort turtles) [ [t] ->
       ask t [
         set line csv:from-row file-read-line
@@ -259,6 +256,36 @@ to initialize-agents
     ifelse network_type = "Kleinberg" [set size 0.5] [set size 1]
   ]
 end
+
+
+to-report file-length [file-name]
+  ;; Opening the file for counting lines
+  file-close
+  file-open file-name
+
+  ;; Initializing counter.
+  ;; Note! We initialize it as -1, because we want to know the number of agents,
+  ;; not number of lines, so we do not count:
+  ;;   a) the first line with variable names and
+  ;;   b) the last line with just end of the file mark,
+  ;; that's why we must start with -1, to omit 2 rows from counting
+  ;; (the first with var names and the last almost empty just with file-end mark)
+  let l -1
+
+  ;; Main WHILE cycle going through the file and counting lines
+  while [not file-at-end?][
+    let just-throw-it-away file-read-line
+    set l (l + 1)
+  ]
+
+  ;; closing file
+  file-close
+
+  ;; Reporting the length of file
+  report l
+end
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;   G O   P R O C E D U R E S   ;;;;;
@@ -663,7 +690,7 @@ CHOOSER
 set_agents
 set_agents
 "From File" "Random Normal" "Random Uniform" "Bipolar" "Neutral"
-1
+0
 
 INPUTBOX
 821
@@ -671,7 +698,7 @@ INPUTBOX
 973
 70
 agent_data
-agents.csv
+DE/items.csv
 1
 0
 String
@@ -682,7 +709,7 @@ INPUTBOX
 1126
 70
 corol_mat_file
-Correlationmatrix.csv
+DE/correlations.csv
 1
 0
 String
@@ -832,7 +859,7 @@ SWITCH
 213
 show-old-links?
 show-old-links?
-0
+1
 1
 -1000
 
