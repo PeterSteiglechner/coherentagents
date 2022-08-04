@@ -1221,6 +1221,8 @@ no_repeat_link?
 
 Builds upon and messes with Frantisek's version :-)
 
+V ...2.1 adds an option to not check if a link aleady exists when making new link - speeds things up a lot! :-)
+
 This adds parameters and visualisations, but most importantly it does link dropping differently, namely:
 
 * Links have a variable: *link_health* ranging from -1 to 1
