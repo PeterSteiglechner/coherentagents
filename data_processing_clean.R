@@ -89,7 +89,8 @@ items |> pivot_longer(attitudenames) |>
   ggplot(aes(value)) + geom_histogram(bins = 30) + facet_wrap(~name, nrow = 1) + theme_bw()
 ## Data Visualization of RCA Groups' item characteristics
 ### Groups' item distributions
-items |> filter(!cluster_exclusion) |> pivot_longer(all_of(attitudenames)) |>
+items |> #filter(!cluster_exclusion) |> 
+  pivot_longer(all_of(attitudenames)) |>
   ggplot(aes(value)) + geom_histogram(bins = 30) + facet_grid(name~group) + theme_bw()
 ### Explore the cross tabulation for one group and two items
 heatmap2times <- function(items, grouplabel = 1, item1 = "freehms", item2 = "gincdif") {
