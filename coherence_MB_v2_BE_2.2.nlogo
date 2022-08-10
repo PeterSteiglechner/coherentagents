@@ -1,13 +1,14 @@
 ;;;;; Model using coherence agents -- written from scratch
 
-;; Updated: 2022-07-12 FranCesko
+;; Updated: 2022-08-10 FranCesko
 
-;; Brucified version based on Marlene's version ("newnew" or ver2, 15/Juk/22)
+;; Brucified version based on Marlene's version ("newnew" or ver2, 15/Jul/22)
 ;; Bruce changed the process of new link creation (01/08/22)
 ;; Peter changed coherence-function using matrix algebra (01/08/22)
+;; FranCesko added STORE! procedure and respective button, switches and inputs (10/08/22)
 
 ;; HEADER STUFF
-extensions [nw array matrix csv table profiler]
+extensions [nw array matrix csv table profiler time]
 
 turtles-own [
   idno               ;; identity number from data
@@ -156,18 +157,14 @@ to initialize-comm-network
     ]
     ;; this reads a previoiusly stored network from file
     network_type = "From File"   [
-      ifelse file-exists? network_file and file-exists? agent_data [
-        file-close
-        file-open agent_data
-        set num_agents file-read
-        file-close
+      ifelse file-exists? network_file [
         resize-world (0 - round(sqrt(num_agents))) round(sqrt(num_agents)) (0 - round(sqrt(num_agents))) round(sqrt(num_agents))
         nw:load-matrix network_file turtles links [ fd (round(sqrt(num_agents)) - 1) ]
         ask links [set hidden? not show-new-links?]
         output-print (word "Initial network set using saved file, " network_file)
-      ][error (word "FILE NOT FOUND! You have to put alongside the model these files '" network_file "' and '" agent_data "' describing your network") ]
+      ][error (word "FILE NOT FOUND! You have to put alongside the model file '" network_file "' describing your network") ]
     ]
-    [error "Network type unknFrom File!"]
+    [error "Network type unknown!"]
   )
 
   ;; Some of the above network methods create slightly the wrong number of agents so cull down to right number -- ***CLUDGE!***
@@ -488,15 +485,117 @@ to-report prob [vl]
   ;; makes code slightly cleaner :-)
   report (random-float 1) < vl
 end
+
+to STORE!
+  ;; If nothing is selected for storing, then stop 'STORE!'.
+  if (not store_agents?) and (not store_network?) and (not store_metadata?) [
+    user-message "Nothing selected for storing,\n'store_agents?' is off\n'store_network?' is off\n'store_metadata?' is off,\n'STORE!' is stopped."
+    stop
+  ]
+
+  ;; We have to prepare random_stamp:
+  let random_stamp ifelse-value (use_random_stamp?) [abs(new-seed)][own_stamp]
+
+  ;; Setting folder to store all files:
+  if storing_folder = "" [
+    user-message "Storing folder is not specified, please do it now."
+    set storing_folder user-directory
+  ]
+  set-current-directory storing_folder
+
+  ;; Storing agents:
+  if store_agents? [
+    ;; Construct filename:
+    if store_agents_filename = "" [set store_agents_filename user-input "How do you name file for storing agents' data?\n(Please, without file extension!)"]
+    let name (word store_agents_filename "_" random_stamp ".csv")
+
+    ;; Creating file:
+    file-open name
+
+    ;; Writing agents data into the file:
+    ;; Variables labels:
+    file-type "idno, "
+    foreach item_labels [l -> file-type l file-type ", "]
+    file-print "group"
+    ;; Turtle data:
+    ask turtles [
+      file-type idno file-type ", "
+      foreach belief_vector [b -> file-type b file-type ", "]
+      file-print group
+    ]
+
+    ;; Closing file:
+    file-close
+  ]
+
+  ;; Storing network
+  if store_network? [
+    ;; Construct filename:
+    if store_network_filename = "" [set store_network_filename user-input "How do you name file for storing network data?\n(Please, without file extension!)"]
+    let name (word store_network_filename "_" random_stamp ".txt")
+
+    ;; Writing network data into the file:
+    nw:save-matrix name
+  ]
+
+  ;; Storing metadata:
+  if store_metadata? [
+    ;; Construct filename:
+    if store_metadata_filename = "" [set store_metadata_filename user-input "How do you name file for storing metadata?\n(Please, without file extension!)"]
+    let name (word store_metadata_filename "_" random_stamp ".csv")
+
+    ;; Creating file:
+    file-open name
+
+    ;; Writing metadata into the file:
+    file-print (word "num_agents, " num_agents)
+    file-print (word "ticks, " ticks)
+    file-print (word "rand-seed, " rand-seed)
+    file-print (word "max_time, " max_time)
+    file-print (word "network_type, " network_type)
+    file-print (word "min_degree, " min_degree)
+    file-print (word "neis, " neis)
+    file-print (word "rewiring, " rewiring)
+    file-print (word "toroidial_world?, " toroidial_world?)
+    file-print (word "clustering_exp, " clustering_exp)
+    file-print (word "Initial_link_goodness, " Initial_link_goodness)
+    file-print (word "set_agents, " set_agents)
+    file-print (word "network_file, " network_file)
+    file-print (word "agent_data, " agent_data)
+    file-print (word "corol_mat_file, " corol_mat_file)
+    file-print (word "k, " k)
+    file-print (word "conformity_tendency, " conformity_tendency)
+    file-print (word "var_of_new_belief, " var_of_new_belief)
+    file-print (word "prob_soc_infl, " prob_soc_infl)
+    file-print (word "prob_self_check, " prob_self_check)
+    file-print (word "link_health_ch, " link_health_ch)
+    file-print (word "drop-bad-link, " drop-bad-link)
+    file-print (word "prob_add_link, " prob_add_link)
+    file-print (word "prob_FoF, " prob_FoF)
+    file-print (word "link_lonely?, " link_lonely?)
+    file-print (word "max_num_links, " max_num_links)
+    file-print (word "no_repeat_link?, " no_repeat_link?)
+
+    ;; Closing file:
+    file-close
+  ]
+
+  ;; Setting back current folder to main folder:
+  if main_folder = "" [
+    user-message "Main folder is not specified, please do it now."
+    set main_folder user-directory
+  ]
+  set-current-directory main_folder
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 148
 10
-656
-519
+655
+518
 -1
 -1
-5.2631578947368425
+10.638297872340425
 1
 10
 1
@@ -506,10 +605,10 @@ GRAPHICS-WINDOW
 0
 0
 1
--47
-47
--47
-47
+0
+46
+0
+46
 1
 1
 1
@@ -575,7 +674,7 @@ CHOOSER
 network_type
 network_type
 "Random" "Watts" "Kleinberg" "Barabasi" "Planar" "From File"
-0
+4
 
 SLIDER
 4
@@ -601,7 +700,7 @@ rewiring
 rewiring
 0
 1
-0.0
+0.001
 0.001
 1
 NIL
@@ -653,8 +752,8 @@ BUTTON
 45
 143
 78
-save netw
-nw:save-matrix network_file
+NIL
+STORE!
 NIL
 1
 T
@@ -668,8 +767,8 @@ NIL
 INPUTBOX
 658
 10
-817
-70
+820
+82
 network_file
 network.txt
 1
@@ -692,7 +791,7 @@ INPUTBOX
 973
 70
 agent_data
-DE/items.csv
+DE\\items.csv
 1
 0
 String
@@ -703,7 +802,7 @@ INPUTBOX
 1126
 70
 corol_mat_file
-DE/correlations.csv
+DE\\correlations.csv
 1
 0
 String
@@ -777,7 +876,7 @@ prob_add_link
 prob_add_link
 0
 1
-0.07
+0.09
 0.01
 1
 NIL
@@ -807,7 +906,7 @@ x_belief
 x_belief
 1
 5
-2.0
+3.0
 1
 1
 NIL
@@ -822,7 +921,7 @@ y_belief
 y_belief
 1
 5
-1.0
+5.0
 1
 1
 NIL
@@ -886,10 +985,10 @@ Network Parameters
 1
 
 TEXTBOX
-809
-71
-959
-89
+819
+95
+920
+113
 Process Parameters
 11
 0.0
@@ -940,7 +1039,7 @@ fuzz
 fuzz
 0
 0.025
-0.002
+0.0
 0.001
 1
 NIL
@@ -976,10 +1075,10 @@ rand-seed
 Number
 
 MONITOR
-661
-74
-711
-119
+659
+82
+709
+127
 s/tck
 secs-per-tick
 3
@@ -995,7 +1094,7 @@ belief_shown
 belief_shown
 1
 5
-1.0
+3.0
 1
 1
 NIL
@@ -1072,7 +1171,7 @@ group_shown
 group_shown
 0
 10
-1.0
+4.0
 1
 1
 NIL
@@ -1132,10 +1231,10 @@ World Viz Params
 1
 
 MONITOR
-714
-74
-766
-119
+712
+82
+764
+127
 lnks/ag
 count links / num_agents
 2
@@ -1181,7 +1280,7 @@ CHOOSER
 Initial_link_goodness
 Initial_link_goodness
 "Random Uniform" "Random Normal" "High" "Neutral" "Low"
-0
+2
 
 SLIDER
 977
@@ -1226,6 +1325,186 @@ no_repeat_link?
 1
 1
 -1000
+
+SWITCH
+1333
+229
+1464
+262
+store_agents?
+store_agents?
+0
+1
+-1000
+
+SWITCH
+1332
+290
+1463
+323
+store_network?
+store_network?
+1
+1
+-1000
+
+SWITCH
+1331
+348
+1462
+381
+store_metadata?
+store_metadata?
+0
+1
+-1000
+
+INPUTBOX
+1157
+289
+1332
+349
+store_network_filename
+network-data
+1
+0
+String
+
+INPUTBOX
+1156
+229
+1332
+289
+store_agents_filename
+agent-data
+1
+0
+String
+
+INPUTBOX
+1156
+348
+1332
+408
+store_metadata_filename
+meta-data
+1
+0
+String
+
+INPUTBOX
+1156
+109
+1464
+169
+storing_folder
+D:\\github\\coherentagents\\StoredData\\
+1
+0
+String
+
+TEXTBOX
+1156
+80
+1472
+111
+NOTE: If the imput reporters are empty, then NetLogo opens the dialog, where the user might find a folder for storing the data.
+11
+0.0
+1
+
+TEXTBOX
+1333
+262
+1483
+288
+Switch tells whether to store agents data.
+10
+15.0
+1
+
+TEXTBOX
+1332
+323
+1482
+349
+Switch tells whwther to store network data.
+10
+15.0
+1
+
+TEXTBOX
+1332
+381
+1482
+407
+Switch tells whether to store simulation metadata.
+10
+15.0
+1
+
+SWITCH
+1156
+409
+1462
+442
+use_random_stamp?
+use_random_stamp?
+0
+1
+-1000
+
+TEXTBOX
+1159
+444
+1465
+519
+NOTE: If this this switch is ON then generates random seed number and adds it at end of all files from one 'STORE!'. I would prefer to use timestamp, but I can't find a way, how to get actual time into NetLogo.\nIf the switch is OFF, then is used 'own_stamp' instead.
+12
+25.0
+1
+
+TEXTBOX
+1156
+13
+1374
+37
+STORING BLOCK:
+20
+0.0
+1
+
+TEXTBOX
+1156
+43
+1472
+74
+Please, don't vrite extensions in '_filename' input reporters. File extensions will be generated automatically.
+12
+35.0
+1
+
+INPUTBOX
+1156
+169
+1464
+229
+main_folder
+D:\\github\\coherentagents\\
+1
+0
+String
+
+INPUTBOX
+1159
+522
+1460
+582
+own_stamp
+A00001
+1
+0
+String
 
 @#$#@#$#@
 ## This version (BE)
@@ -1683,7 +1962,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.2.0
+NetLogo 6.2.2
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
