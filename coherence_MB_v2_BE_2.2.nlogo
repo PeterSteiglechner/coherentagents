@@ -6,6 +6,8 @@
 ;; Bruce changed the process of new link creation (01/08/22)
 ;; Peter changed coherence-function using matrix algebra (01/08/22)
 ;; FranCesko added STORE! procedure and respective button, switches and inputs (10/08/22)
+;; Peter corrected errors in link_health/link-dropping (12/08/22)
+
 
 ;; HEADER STUFF
 extensions [nw array matrix csv table profiler time]
@@ -279,7 +281,7 @@ to go
     set hidden? not show-old-links?
     ;; The core procedure happens only with probability prob_soc_infl for every connected pair of agents:
     if prob prob_soc_infl [be-socially-influenced] ; process 1 (includes link health update)
-    if prob (drop-bad-link * (logistic (link_health) (k_link)) ) [die] ;; process 4 using same logistic function with same k
+    if prob (drop-bad-link * (logistic (link_health) (k_link)) ) [die] ;; process 4 using same logistic function with (negative) k_link
   ]
 
   ;; Self-coherency checks and new links creation will do agents in random order:
