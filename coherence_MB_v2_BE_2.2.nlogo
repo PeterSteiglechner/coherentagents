@@ -178,29 +178,10 @@ end
 
 to initialize-links
   ;;
-  (ifelse
-    Initial_link_goodness = "Random Uniform" [
-      ask links [set link_health rand-unif-val]
-      output-print "Initial link healths set randomly from a uniform [-1, 1] distribution"
-    ]
-    Initial_link_goodness = "Random Normal" [
-      ask links [set link_health rand-norm-val]
-      output-print "Initial link healths set randomly from a normal N(0,0.3333) distribution"
-    ]
-    Initial_link_goodness = "High" [
-      ask links [set link_health 1]
-      output-print "Initial link healths all set to 1"
-    ]
-    Initial_link_goodness = "Neutral" [
-      ask links [set link_health 0]
-      output-print "Initial link healths all set to 0"
-    ]
-    Initial_link_goodness = "Low" [
-      ask links [set link_health -1]
-      output-print "Initial link healths all set to -1"
-    ]
-    [error "Link initialisataion type unknown!"]
-    )
+  ask links [
+    set link_health 1
+  ]
+
 end
 
 
@@ -298,7 +279,7 @@ to go
     set hidden? not show-old-links?
     ;; The core procedure happens only with probability prob_soc_infl for every connected pair of agents:
     if prob prob_soc_infl [be-socially-influenced] ; process 1 (includes link health update)
-    if prob (drop-bad-link * logistic link_health) [die] ;; process 4 using same logistic function with same k
+    if prob (drop-bad-link * (logistic (link_health) (k_link)) ) [die] ;; process 4 using same logistic function with same k
   ]
 
   ;; Self-coherency checks and new links creation will do agents in random order:
@@ -376,7 +357,11 @@ to add-new-link   ;; All agents create one or zero new links to a new agent. Not
     if no_repeat_link?
       [set potential_new_neighbors potential_new_neighbors with [(not link-neighbor? myself)]]
     if any? potential_new_neighbors
-      [create-link-with (one-of potential_new_neighbors) [set hidden? not show-new-links?]]
+      [create-link-with (one-of potential_new_neighbors) [
+        set hidden? not show-new-links?
+        set link_health 1
+        ]
+      ]
   ]
 end
 
@@ -386,7 +371,7 @@ to-report change-belief [old new group_num belief_position]
   let old_coherency coherence-function (matrix) (old)
   let new_coherency coherence-function (matrix) (new)
   let diff_coherency new_coherency - old_coherency
-  if prob logistic diff_coherency [
+  if prob (logistic (diff_coherency) (k))[
       let belief_change conformity_tendency * ((item belief_position new) - (item belief_position old)) ; increase or decrease of belief
       let new_belief (item belief_position old) + belief_change
       if new_belief > 1 [set new_belief 1 print "attention"]
@@ -470,9 +455,9 @@ to-report rand-bipolar-val
     [report -1 - bp]
 end
 
-to-report logistic [vl]
+to-report logistic [vl steepness-k]
   ;; the logistic function
-  report 1 / ( 1 + exp (- k * vl))
+  report 1 / ( 1 + exp (- steepness-k * vl))
 end
 
 to-report linear [vl]
@@ -558,12 +543,13 @@ to STORE!
     file-print (word "rewiring, " rewiring)
     file-print (word "toroidial_world?, " toroidial_world?)
     file-print (word "clustering_exp, " clustering_exp)
-    file-print (word "Initial_link_goodness, " Initial_link_goodness)
+    ;file-print (word "Initial_link_goodness, " Initial_link_goodness)
     file-print (word "set_agents, " set_agents)
     file-print (word "network_file, " network_file)
     file-print (word "agent_data, " agent_data)
     file-print (word "corol_mat_file, " corol_mat_file)
     file-print (word "k, " k)
+    file-print (word "k_link, " k_link)
     file-print (word "conformity_tendency, " conformity_tendency)
     file-print (word "var_of_new_belief, " var_of_new_belief)
     file-print (word "prob_soc_infl, " prob_soc_infl)
@@ -595,7 +581,7 @@ GRAPHICS-WINDOW
 518
 -1
 -1
-10.638297872340425
+5.2631578947368425
 1
 10
 1
@@ -605,10 +591,10 @@ GRAPHICS-WINDOW
 0
 0
 1
-0
-46
-0
-46
+-47
+47
+-47
+47
 1
 1
 1
@@ -674,7 +660,7 @@ CHOOSER
 network_type
 network_type
 "Random" "Watts" "Kleinberg" "Barabasi" "Planar" "From File"
-4
+1
 
 SLIDER
 4
@@ -791,7 +777,7 @@ INPUTBOX
 973
 70
 agent_data
-DE\\items.csv
+DE/items.csv
 1
 0
 String
@@ -802,46 +788,46 @@ INPUTBOX
 1126
 70
 corol_mat_file
-DE\\correlations.csv
+DE/correlations.csv
 1
 0
 String
 
 SLIDER
-808
-140
-976
-173
+807
+178
+975
+211
 conformity_tendency
 conformity_tendency
 0
 1
-0.3
+0.4
 0.05
 1
 NIL
 HORIZONTAL
 
 SLIDER
-808
-175
-977
-208
+807
+213
+976
+246
 var_of_new_belief
 var_of_new_belief
 0
 1
-0.1
+0.12
 0.01
 1
 NIL
 HORIZONTAL
 
 SLIDER
-807
-210
-977
-243
+806
+248
+976
+281
 prob_soc_infl
 prob_soc_infl
 0
@@ -853,10 +839,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-807
-245
-975
-278
+806
+283
+974
+316
 prob_self_check
 prob_self_check
 0
@@ -985,10 +971,10 @@ Network Parameters
 1
 
 TEXTBOX
-819
-95
-920
-113
+816
+154
+962
+172
 Process Parameters
 11
 0.0
@@ -1026,7 +1012,7 @@ SWITCH
 247
 show-new-links?
 show-new-links?
-1
+0
 1
 -1000
 
@@ -1046,10 +1032,10 @@ NIL
 HORIZONTAL
 
 INPUTBOX
-919
-76
-969
-136
+911
+75
+961
+135
 k
 10.0
 1
@@ -1125,7 +1111,7 @@ SWITCH
 573
 visualisations?
 visualisations?
-1
+0
 1
 -1000
 
@@ -1272,16 +1258,6 @@ Link initialisation
 0.0
 1
 
-CHOOSER
-4
-402
-145
-447
-Initial_link_goodness
-Initial_link_goodness
-"Random Uniform" "Random Normal" "High" "Neutral" "Low"
-2
-
 SLIDER
 977
 72
@@ -1291,7 +1267,7 @@ link_health_ch
 link_health_ch
 0
 1
-1.0
+0.42
 0.01
 1
 NIL
@@ -1398,7 +1374,7 @@ INPUTBOX
 1464
 169
 storing_folder
-D:\\github\\coherentagents\\StoredData\\
+/home/peter/
 1
 0
 String
@@ -1450,7 +1426,7 @@ SWITCH
 442
 use_random_stamp?
 use_random_stamp?
-0
+1
 1
 -1000
 
@@ -1490,7 +1466,7 @@ INPUTBOX
 1464
 229
 main_folder
-D:\\github\\coherentagents\\
+/home/peter/
 1
 0
 String
@@ -1505,6 +1481,27 @@ A00001
 1
 0
 String
+
+INPUTBOX
+830
+73
+896
+133
+k_link
+-100.0
+1
+0
+Number
+
+TEXTBOX
+833
+135
+983
+153
+k_link<0!!!
+12
+0.0
+1
 
 @#$#@#$#@
 ## This version (BE)
@@ -1962,7 +1959,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.2.2
+NetLogo 6.2.0
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
