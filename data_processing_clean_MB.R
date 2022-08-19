@@ -69,7 +69,7 @@ computeCorrelations <- function(df, attitudenames = c("freehms", "gincdif", "lrs
   df_matrix_temp <- 
       df |> select(attitudenames) |>  
       cor() |> as_tibble() |> 
-      mutate(item = attitudenames)
+      mutate(item = attitudenames, group = 1)
     df_matrix <- bind_rows(df_matrix, df_matrix_temp)
   df_matrix
 }
@@ -83,8 +83,9 @@ writeForABM <- function(df, attitudenames, country_name, groupingMethod, method 
   if (!dir.exists(country_name)) {
     dir.create(country_name)
   } 
-  write_csv((items %>% select(-cluster_exclusion)), paste0(country_name,"/items.csv"))
+  write_csv((items %>% select(-cluster_exclusion)), paste0(country_name,"/itemsCCA.csv"))
   write_csv(correlationsCCA, paste0(country_name,"/correlationsCCA.csv"))
+  write_csv((items %>% select(-cluster_exclusion) %>% mutate(group = 1)), paste0(country_name,"/items.csv"))
   write_csv(correlations, paste0(country_name,"/correlations.csv"))
 }
 
