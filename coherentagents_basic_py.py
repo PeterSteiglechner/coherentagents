@@ -1,223 +1,239 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# 
+"""
+author: Peter Steiglechner
+last update: 18 August 2022
+log:
+    - 18-08-2022: updated the model to fit coherence_MB_v2_BE_2.2.nlogo and included the _PS version
+"""
+
+
 import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx 
-import sys
+import os
 import copy
 import pandas as pd
 import time
 
-class Model:
-    def __init__(self, **kwargs) -> None:
-        # ---- Set parameters ----
-        self.seed = kwargs["seed"]                      # random seed
-        np.random.seed(self.seed)
-        self.country = kwargs["country"]                # country / folder
-        self.n_agents = kwargs["n_agents"]              # nr of agents
-        self.k = kwargs["k"]                            # steepness of logistic curve --> importance of coherence in adaptation.
-        self.gamma = kwargs["gamma"]                    # prob to break link if reject
-        self.beta = kwargs["beta"]                      # prob to reflect (self-coherence)
-        self.alpha = kwargs["alpha"]                    # prob to be socially influenced
-        self.kappa = kwargs["kappa"]                    # prob to establish a new link
-        self.th_cut_link = kwargs["th_cut_link"]        # threshold of distance between message and corresponding belief to cut link if message rejected
-        self.noise = kwargs["noise"]                    # noise in reflection (craziness-of-new-belief)
-        self.learning_rate = kwargs["learning_rate"]    # rate at which social influence is adopted. Conformity tendency 
-        self.n_attitudes = kwargs["n_attitudes"]        # number of belief items
-        self.network_params = kwargs["network_params"]  # type of network. currently: {"watts", "random"} 
-        #                                               # depending on the type of network, different parameters need to be chosen
-        self.init_beliefs = kwargs["init_beliefs"]              # how do we determine initial beliefs of the agents? currently: {"random", "data"}
-        #                                               # the "data" option requires n_agents=2203
-        self.save_network = kwargs["save_network"]      # save the network data together with the beliefs?
+logistic = lambda x, k: 1/(1+np.exp(-k*x))
 
-        # ---- Get correlation matrices from .csv ----
-        # Load matrices for different groups which are stacked on top of each other
+class Model:
+    def __init__(self, version, **kwargs) -> None:
+        self.errorFlag = False
+        self.version = version
+        
+        # ---- Set parameters ----
+        self.rand_seed = kwargs["rand_seed"]           
+        self.init_beliefs = "from_data"                       # how do we determine initial beliefs of the agents? currently: {"random", "data"}
+        self.n_attitudes = kwargs["n_attitudes"]            # in equations: m
+        self.network_type = kwargs["network_type"]      # currently: {"watts", "random"} 
+        self.network_params = kwargs["network_params"]  
+        self.country = kwargs["country"]                # currently "DE" "PL "CZ". 
+        self.k_coherence = kwargs["k_coherence"]        # steepness of logistic curve --> importance of coherence in adaptation. 
+        self.k_link = kwargs["k_link"]                  # steepness of logistic curve --> importance of link health in link dropping.        
+        self.conformity_tendency = kwargs["conformity_tendency"]            # in equations: \mu
+        self.variance_of_new_belief = kwargs["variance_of_new_belief"]      # in equations: \sigma
+        self.prob_social_influence = kwargs["prob_social_influence"]
+        self.prob_self_check = kwargs["prob_self_check"]
+        self.link_health_change = kwargs["link_health_change"]              # in equations: \gamma
+        self.max_prob_drop_bad_link = kwargs["max_prob_drop_bad_link"]
+        self.prob_FoF = kwargs["prob_FoF"]
+        self.link_lonely = bool(kwargs["link_lonely"])
+        if self.version == "coherence_MB_v2_BE_2.2":        # not needed in 
+            self.prob_add_link = kwargs["prob_add_link"]
+            self.max_num_links = kwargs["max_num_links"]
+        else:
+            self.max_num_links = 1000
+        #self.no_repeat_link = kwargs["no_repeat_link"]     # TODO not yet implemented ??? 
+
+        # ---- Check if parameters are set correctly ----    
+        # different parameters need to be given depending on the type of network.
+        if  not ((self.network_type == "random" and ("link_prob" in self.network_params.keys())) or 
+          (self.network_type == "watts"  and ("avg_node_degree" in self.network_params.keys()) and ("rewiring_prob" in self.network_params.keys())) ):
+            print("ERROR: network parameters or network type"); self.errorFlag = True; return
+        if not os.path.exists(self.country+"/items.csv") or not os.path.exists(self.country+"/correlations.csv"):
+            print("ERROR: Wrong country, file structure, or missing files items.csv or correlations.csv"); self.errorFlag = True; return
+        if self.k_link>0 or self.k_coherence<0:
+            print("ERROR: one of the logistic k values is not correct"); self.errorFlag = True; return
+        if not ((self.init_beliefs == "from_data") or (self.init_beliefs == "random" and "n_agents" in kwargs.keys())):
+                print("ERROR: init_belief should be 'random' or 'from_data'. If init_beliefs is 'random', then user needs to specify 'n_agents'"); self.errorFlag = True; return
+   
+        # ---- Set seed ----
+        np.random.seed(self.rand_seed)
+
+        # ---- Get correlation matrices from correlations.csv ----
+        # Load matrices for different groups from external file. The matrices are stacked on top of each other
         corr_matrix_data = pd.DataFrame(pd.read_csv(self.country+"/correlations.csv"))
-        self.attitudenames = corr_matrix_data["item"][:self.n_attitudes]
+        self.attitude_names = corr_matrix_data["item"][:self.n_attitudes]
         self.n_groups = len(corr_matrix_data)/self.n_attitudes
-        if not self.n_groups%1== 0:
+        if not int(self.n_groups) == self.n_groups:
             # n_groups is not an integer. 
-            print("ERROR: in matrix_read")
-            return 0
+            print("ERROR: in reading the matrix. Correlation matrices do not match nr_groups * nr_attitudes"); self.errorFlag = True; return
         self.matrix_list = []                           # store the correlation matrices
         for i in range(int(self.n_groups)):
-            # take entries from i*n_attitueds to (i+1) * n_attitudes, e.g. for n_attitudes=5: from 0 to 4, from 5 to 9, ... for n_groups times.
-            m = corr_matrix_data[self.attitudenames].iloc[range(i*self.n_attitudes, (i+1)*self.n_attitudes)]
-            m["index"] = self.attitudenames
-            m = m.set_index("index")
-            m_nodiag = m - np.diag(np.ones(self.n_attitudes))       # set diagonal to zero.
-            self.matrix_list.append(m_nodiag)
-
-        # ---- Init Network ----
-        # using the network_type {"watts", "random"} create a social network. depending on the type of network, different parameters need to be specified
-        if self.network_params["type"]=="watts":
-            self.network = nx.watts_strogatz_graph(self.n_agents, self.network_params["k"], self.network_params["p"])
-            self.pos = nx.circular_layout(self.network)
-        elif self.network_type == "random":
-            self.network = nx.erdos_renyi_graph(self.n_agents, self.network_params["p"])
-            self.pos = nx.spring_layout(self.network)
-        else:
-            print("ERROR: specify correct network_type. ...Aborting.")
-            return 
-        self.edges = list(self.network.edges)
-        self.n_edges = len(self.edges)
+            # take entries from i * n_attitudes to (i+1) * n_attitudes, e.g. for n_attitudes=5: from 0 to 4, from 5 to 9, ... for n_groups times.
+            matrix = corr_matrix_data[self.attitude_names].iloc[range(i*self.n_attitudes, (i+1)*self.n_attitudes)]
+            matrix["index"] = self.attitude_names
+            matrix = matrix.set_index("index")
+            matrix_with_zero_diag = matrix - np.diag(np.ones(self.n_attitudes))       # set diagonal to zero.
+            self.matrix_list.append(matrix_with_zero_diag)
         
-        # ---- Init Agents ----
+        # ---- Get init data from items.csv ----
         # initialise agents with beliefs, the corresponding id number, and their group
-        if self.init_beliefs=="data" and not self.n_agents==2203:
-            print("WARNING: nr of agents is not 2203 but you try to initialise the agent beliefs to the data. The initial beliefs are therefore drawn randomly")
-            self.init_beliefs = "random"
-        if self.init_beliefs == "data":
+        if self.init_beliefs=="from_data":
             surveydata = pd.read_csv(self.country+"/items.csv")
             self.groups = surveydata["group"]
-            init_beliefs = surveydata[self.attitudenames].to_numpy()
+            self.n_agents = len(self.groups)
+            init_beliefs = surveydata[self.attitude_names].to_numpy()
             ids = surveydata["idno"]
         elif self.init_beliefs == "random":
+            self.n_agents = kwargs["n_agents"]
             self.groups = np.random.randint(0,self.n_groups, size=self.n_agents)
-            init_beliefs = np.random.random(size=(self.n_agents, self.n_attitudes))*2-1  # could also initialise as pd.DataFrame( *, columns=self.attitudenames)
+            init_beliefs = np.random.random(size=(self.n_agents, self.n_attitudes)) * 2 - 1   
             ids = np.array(range(len(init_beliefs)))
-        # Create list of all agents (with model, unique_id, group, and belief):
-        self.agents = [Agent(self, i, idno, group-1, belief) for i, (idno, group, belief) in enumerate(zip(ids, self.groups, init_beliefs))]
-
-        self.times_to_track = None
-        self.running = 1
-        # TEST: to check how often each process took place:
-        #    self.counts=dict(reflection=0, influence=0, linkbreak=0, linknew=0, samebelief_influence=0)
+       
+        # ---- Init Network ----
+        # using the network_type {"watts", "random"} create a social network. depending on the type of network, different parameters need to be specified
+        if self.network_type == "watts":
+            self.network = nx.watts_strogatz_graph(self.n_agents, self.network_params["avg_node_degree"], self.network_params["rewiring_prob"])
+            self.pos = nx.circular_layout(self.network)
+        elif self.network_type == "random":
+            self.network = nx.erdos_renyi_graph(self.n_agents, self.network_params["link_prob"])
+            self.pos = nx.spring_layout(self.network)
+        nx.set_edge_attributes(self.network, 1.0, "health")
+        self.edges = list(self.network.edges(data=True))
+        
+        # ---- Init Agents ----
+        #  Create list of all agents (with model, unique_id, group, and belief):
+        self.agents = [Agent(self, i, id_nr, group-1, belief) for i, (id_nr, group, belief) in enumerate(zip(ids, self.groups, init_beliefs))]
         return 
-
-    def run(self, T, times_to_track, verbose=False) -> int:
+    
+    def run(self, T, times_to_track, verbose=False, save_network=False) -> int:
         """
         run the model for T steps and store the agent beliefs at all values in times_to_track
         """
-        self.times_to_track = times_to_track
-        d = pd.DataFrame()                            # output data frame
-        d = pd.concat([d, self.observe_opinions(t=0)])  # append a dataframe with initial opinions
+        results = pd.DataFrame()                            # output data frame
+        results = pd.concat([results, self.observe_opinions(t=0)])  # append a dataframe with initial opinions
+        if save_network:
+            results_network = pd.DataFrame()                            # output data frame
+            results_network = pd.concat([results_network, self.observe_network(t=0)])  # append a dataframe with initial opinions
+        else:
+            results_network = None
+        if verbose: print("initial state saved, start running")
         for t in range(1,T+1):
             # advance one time step
-            for _ in range(self.n_agents):
-                # do n_agents update steps (with randomly selected agents)
-                self.running = self.single_step()
-            if t in self.times_to_track:
-                # store values:
+            # do n_agents update steps (with randomly selected agents). returns 1 if everything went good, 0 else
+            self.single_step()
+            self.edges = list(self.network.edges(data=True))
+            if t in times_to_track:
+                # store values for time t:
                 if verbose: print("{}".format(t), end=", ")
-                d = pd.concat([d, self.observe_opinions(t)])  # append a dataframe with current opinions
-                if self.save_network:
-                    self.observe_network(t)
-        if verbose: print("...done")
-        return self.running, d
+                results = pd.concat([results, self.observe_opinions(t)])  # append a dataframe with current opinions
+                if save_network:
+                    results_network = pd.concat([results_network, self.observe_network(t)])
+            if self.errorFlag:
+                break
+        if verbose:  print("...done")
+        return results, results_network
+       
+    
+    def single_step(self) -> int:
+        # 1) SOCIAL INFLUENCE
+        if self.edges:
+            # Activate each edge/link with probability p_s (in random order), then update the link health, and correspondingly potentially drop them 
+            np.random.shuffle(self.edges)
+            for i,j,hdict in self.edges:            
+                health = hdict["health"]
+                if np.random.random() < self.prob_social_influence:
+                    active_link = (i,j) if np.random.random()<0.5 else (j, i)
+                    receiver, speaker = [self.agents[active_link[0]], self.agents[active_link[1]]] 
+                    coherence_of_suggestion = self.be_socially_influenced(receiver, speaker)     # Process 1: Soc Infl
+                    health = self.update_link_health(health, coherence_of_suggestion)
+                    self.network[i][j]["health"] = health
+                    if self.version == "coherence_MB_v2_BE_2.2_PS":
+                        isLinkRemoved = self.potentially_remove_link(active_link, health)   # Process 3_PS: Rewiring
+                        if isLinkRemoved: self.add_new_link(receiver)
+                # 3) LINK DROPPING 
+                if self.version == "coherence_MB_v2_BE_2.2":
+                    self.potentially_remove_link((i,j), health)         # Process 3: Link Dropiing
+        # 2) SELF-CHECKS and 4) LINK ADDING
+        agent_order = copy.copy(self.agents)
+        np.random.shuffle(agent_order)
+        for ag in agent_order:
+            if np.random.random() < self.prob_self_check:
+                ag.self_check()                                      # Process 2: Self-check
+            if self.version == "coherence_MB_v2_BE_2.2":
+                if np.random.random() < self.prob_add_link:
+                    self.add_new_link(ag)                       # Process 4: new link
+            if self.link_lonely:
+                if not ag.nbs:
+                    self.add_new_link(ag)
+        return 
 
-    def vis_network(self) -> None:
-        """
-        visualise the network 
-        """
-        fig = plt.figure()
-        ax = fig.add_subplot(111)
-        self.network = nx.Graph()
-        self.network.add_nodes_from(range(self.n_agents))
-        self.network.add_edges_from(self.edges)
-        self.pos = nx.spring_layout(self.network)
-        cmap = copy.copy(plt.get_cmap("Set1"))
-        colors = [cmap(g) for g in self.groups]
-        nx.draw(self.network, self.pos, ax=ax, node_color=colors)
-        self
+    def potentially_remove_link(self, link, health) -> bool:
+        prob_drop_link = self.max_prob_drop_bad_link * logistic(health, self.k_link)
+        if np.random.random() < prob_drop_link:
+            self.agents[link[0]].nbs.remove(link[1])  # remove agent i from agent j's neighbours
+            self.agents[link[1]].nbs.remove(link[0])  # remove agent j from agent i's neighbours
+            self.network.remove_edge(link[0], link[1])  # remove edge with the link_id
+            return True
+        return False  
 
-    def observe_network(self, t):
-        self.network = nx.Graph()
-        self.network.add_nodes_from(range(self.n_agents))
-        self.network.add_edges_from(self.edges)
+    def add_new_link(self, ag) -> None:
+        if len(ag.nbs) < self.max_num_links:
+            if np.random.random() < self.prob_FoF and ag.nbs:
+                potential_new_neighbours = list(np.unique(np.concatenate([self.agents[nb].nbs for nb in ag.nbs])))
+            else:
+                potential_new_neighbours = list(range(self.n_agents))
+            for nb in ag.nbs:
+                if nb in potential_new_neighbours: 
+                    potential_new_neighbours.remove(nb)
+            if ag.unique_id in potential_new_neighbours: 
+                potential_new_neighbours.remove(ag.unique_id)
+            if potential_new_neighbours:
+                new_nb = potential_new_neighbours[int(np.random.random() * len(potential_new_neighbours))]
+                ag.nbs.append(new_nb)
+                self.agents[new_nb].nbs.append(ag.unique_id)
+                self.network.add_edge(new_nb, ag.unique_id, health=1.0)
+        return    
+
+    def be_socially_influenced(self, receiver, sender) -> float:
+        discussion_topic = int(np.random.random() * self.n_attitudes)      # topic/dimension to be discussed
+        focal_belief = copy.copy(receiver.belief)                 # note: need to copy the n_attitude-dim vector.
+        focal_belief[discussion_topic] = sender.belief[discussion_topic]
+        coherence_focal = receiver.adapt_or_reject(focal_belief)           
+        return coherence_focal
+
+    def update_link_health(self, last_health, recent_coherency) -> None:
+        return self.link_health_change * recent_coherency + (1 - self.link_health_change) * last_health
+
+    def observe_network(self, t) -> pd.DataFrame:
+        #self.network = nx.Graph()
+        #self.network.add_nodes_from(range(self.n_agents))
+        #self.network.add_weighted_edges_from([(i,j,h_ij) for (i,j), h_ij in zip (self.edges, self.link_health)], weight="link_health")
         current_network = nx.to_pandas_edgelist(self.network)
-        current_network["t"] = [t for _ in current_network["source"]]
+        current_network["t"] = [t for _i in current_network["source"]]
         return current_network
 
     def observe_opinions(self, t) -> pd.DataFrame:    
-        """
-        get current beliefs of all agents and return them in a dataframe with the current time t. 
-        """  
-        current_state = pd.DataFrame([ag.belief for ag in self.agents], columns=self.attitudenames)
+        current_state = pd.DataFrame([ag.belief for ag in self.agents], columns=self.attitude_names)
         current_state["group"] = self.groups 
         current_state["t"] = [t for _ in self.agents]     
-
         return current_state
-
-    def single_step(self) -> int:
-        """
-        do a single step for one agent.
-        """
-        # (1+3) Social Influence + Link Cutting
-        if self.n_edges == 0:
-            # network has no more edges --> no social influence/link-cutting
-            if self.running==1:
-                print("WARNING: network has no links")
-                self.running=0
-            # select a random "receiver" who might do a reflection (see 2)
-            receiver = np.random.choice(len(self.n_agents))
-        else:
-            # select link with two nodes to be receiver and sender
-            # Note: networkx is extremely slow in sampling the links as long as links keep changing. 
-            # The following two lines are thus replaced by a faster list approach
-            #   link_id = np.random.choice(self.n_edges)
-            #   interacting_nodes = list(self.network.edges)[link_id]
-            link_id = np.random.choice(self.n_edges)
-            link = self.edges[link_id]
-            # randomly choose sender and receiver from the chosen link ends
-            receiver_id, sender_id = (link[0], link[1]) if np.random.random()<0.5 else (link[1], link[0]) 
-            sender = self.agents[sender_id]
-            receiver = self.agents[receiver_id]
-        
-            # (1) Social influence
-            if np.random.random() < self.alpha:
-                focal_belief = np.random.choice(self.n_attitudes)   # topic/dimension to be discussed
-                testbelief = copy.copy(receiver.belief)                 # note: need to copy the n_attidude-dim vector.
-                testbelief[focal_belief] = sender.belief[focal_belief]
-                # TEST: count how often agents are socially influenced by the exact same opinion they already hold.
-                #    if (testbelief==receiver.belief).all():
-                #      self.counts["samebelief_influence"]+=1
-                #    else:
-                success = receiver.adapt_or_reject(testbelief, rate=self.learning_rate)
-                # (3) potentially break link
-                if (not success) and (np.random.random() < self.gamma) and (abs(testbelief[focal_belief] - receiver.belief[focal_belief]) > self.th_cut_link):
-                    #self.network.remove_edge(interacting_nodes[0], interacting_nodes[1])
-                    receiver.nbs.remove(sender_id)  # remove sender from receiver's neighbours
-                    sender.nbs.remove(receiver_id)  # remove receiver from sender's neighbours
-                    # TEST self.counts["linkbreak"] += 1
-                    del self.edges[link_id]  # remove edge with the link_id
-                    self.n_edges -= 1
-                # TEST: see above
-                # else:
-                #    self.counts["influence"]+=1
-
-        # (2) Reflection 
-        if np.random.random() < self.beta:
-            focal_belief = np.random.choice(self.n_attitudes)
-            testbelief = copy.copy(receiver.belief) 
-            testbelief[focal_belief] = max(-1, min(np.random.normal(loc=testbelief[focal_belief], scale=self.noise), 1))  # = prior + Gauss Noise; bounded between -1 and 1
-            success = receiver.adapt_or_reject(testbelief, rate=1)
-            # TEST 
-            # if success:
-            #    self.counts["reflection"]+=1
-
-        # (4) Add new random link
-        if (np.random.random() < self.kappa):
-            # an agent considers only potential links to agents that are not already neighbour or to itself.
-            potential_new_neighbours = [k for k in range(self.n_agents) if k not in receiver.nbs or k==receiver_id]
-            new_neighbour = np.random.choice(potential_new_neighbours)
-            # OLD: self.network.add_edge(receiver_id, new_neighbour)
-            receiver.nbs.append(new_neighbour)  # add new neighbour to the neighbour list
-            self.agents[new_neighbour].nbs.append(receiver_id)  # add receiver to the new_neighbour's neighbour list
-            self.edges.append((receiver_id, new_neighbour))
-            self.n_edges += 1
-            # TEST see above:
-            #    self.counts["linknew"]+=1  
-            
-        return self.running
-
-
 
 
 class Agent:
     def __init__(self, model, unique_id, data_idno, group, belief) -> None:
         """
-        An agent is a single person (1) embedded in a model, (2) with a unique_id, 
-        (3) with an idno in the survey data (if applicable), (4) with a group index, 
-        (5) with a belief from which we calculate (6) its coherence, and 
+        An agent is a single person 
+        (1) embedded in a model, 
+        (2) with a unique_id, 
+        (3) with an idno in the survey data (if applicable), 
+        (4) with a group index, 
+        (5) with a belief from which we calculate 
+        (6) its coherence,  
         (7) a list of neighbours in the social network.
         """
         self.model = model                                              # model in which the agent is embedded
@@ -233,64 +249,81 @@ class Agent:
     def calc_coherency(self, belief_vec) -> float:
         """ 
         calculate the coherency of a belief_vec b given the agent's group coherency matrix CMat
-        c = 0.5 * b.T * CMat * b 
-        e.g. for 2D: b = (x,y) and CMat = ( (0, r); (r, 0)), then c = 0.5 * (x*r*y + y*r*x) = r*x*y
+        c = 0.5 * b.T * (CMat-1) * b 
+        e.g. for n_attitudes=2: b = (x,y) and CMat-1 = ( (0, r); (r, 0)), then c = 0.5 * (x*r*y + y*r*x) = r*x*y
         """
-        c = np.dot(belief_vec.T, np.dot(self.model.matrix_list[self.group], belief_vec)) / 2
-        return c       
+        return 1/2 *np.dot(belief_vec.T, np.dot(self.model.matrix_list[self.group], belief_vec))
     
-    def adapt_or_reject(self, testbelief, rate=1) -> int:
-        """ calculate coherence change when adopting the testbelief, then adapt (in parts determined by the rate) with certain (logistic) probability. """
-        test_coherency = self.calc_coherency(testbelief)
+    def self_check(self) -> None:
+        discussion_topic = int(np.random.random() * self.model.n_attitudes) 
+        noisy_deviation = copy.copy(self.belief)
+        noisy_deviation[discussion_topic] = np.random.normal(loc=self.belief[discussion_topic], scale=self.model.variance_of_new_belief)  # = prior + Gauss Noise;
+        noisy_deviation[discussion_topic] = max(-1, min(noisy_deviation[discussion_topic], 1))  #  bounded between -1 and 1
+        self.adapt_or_reject(noisy_deviation)
+        return 
+
+    def adapt_or_reject(self, test_belief) -> float:
+        """ calculate coherence change when adopting the test_belief, then adapt (in parts) with certain (logistic) probability. """
+        test_coherency = self.calc_coherency(test_belief)
         c_diff = test_coherency - self.coherency
-        prob_adapt = 1 / ( 1 + np.exp( - self.model.k * c_diff))
+        prob_adapt = logistic(c_diff, self.model.k_coherence)
         if np.random.random() < prob_adapt:
-            # adapt with certain rate (1 for reflection and model.learning_rate for social influence)
-            self.belief += rate * (testbelief-self.belief)
+            # adapt
+            self.belief += self.model.conformity_tendency * (test_belief - self.belief)
             self.coherency = test_coherency
-            return 1
-        else:
-            return 0
+        return test_coherency
 
 
-            
+# ---- MAIN FUNCTION ----
 
 def simulation(T, track_times, params, verbose=False, save_network=False):
     s0 = time.time()
-    m = Model(**params, save_network=save_network)
-    run_finished, results = m.run(T, track_times, verbose=verbose)
-    if run_finished:
+    m = Model(**params)
+    if not m.errorFlag:
+        if verbose: print("Setup DONE")
+        results, results_network = m.run(T, track_times, verbose=verbose,save_network=save_network)
+    if not m.errorFlag:
         s1 = time.time()
         minutes = int((s1-s0)/60)
         seconds = s1-s0 - 60 * minutes
-        return (minutes, seconds), results
+        return (minutes, seconds), results, results_network
     else:
-        print("An ERROR occured!")
+        print("An ERROR occurred!")
         return None
-
-def testmain():
-    track_times = [0,1,2,3,4,5,6,7,8,9,10]  # [0,10,50,100,200,500,1000]
-    T = 10
-    params = dict(seed=42, 
-        country="DE", 
-        n_agents=2203, 
-        k=10, 
-        gamma=0.1, 
-        beta=0.5, 
-        alpha=0.5, 
-        kappa=0.1, 
-        th_cut_link=0.2, 
-        n_attitudes=5, 
-        noise = 0.1, 
-        learning_rate=0.5,
-        network_params={"type":"watts", "p":0.1, "k":10}, 
-        init_beliefs="data" 
-    )
-    ellapsed_time, results = simulation(T, track_times, params)
-    print(results)
-    print("ellapsed time: {:} min and {:.1f} seconds".format(ellapsed_time[0], ellapsed_time[1])) 
 
 
 
 if __name__ == '__main__':
-    testmain()
+    # TEST RUN 
+    def test_main_func():
+        track_times = [0,1,2,3,4,5,6,7,8,9,10]  # [0,10,50,100,200,500,1000]
+        T = 10
+        params = dict(
+            rand_seed=42, 
+            network_type = "watts",
+            network_params={"rewiring_prob":0.1, "avg_node_degree":10}, 
+            country="DE", 
+            n_attitudes = 5,
+            #n_agents=2203, 
+            k_coherence=10,
+            k_link=-100, 
+            conformity_tendency = 0.3,
+            variance_of_new_belief = 0.0,
+            prob_social_influence = 1.0 ,
+            prob_self_check = 0.0,
+            link_health_change = 0.0,
+            max_prob_drop_bad_link = 0.0,
+            prob_FoF = 0.0,
+            version = "coherence_MB_v2_BE_2.2",
+            prob_add_link = 0.0,
+            link_lonely = False,
+            max_num_links = 100,
+            init_beliefs="from_data",
+        )
+        elapsed_time, results, results_network = simulation(T, track_times, params, verbose=True, save_network=True)
+        print(results)
+        print(results_network)
+        print("elapsed time: {:} min and {:.1f} seconds".format(elapsed_time[0], elapsed_time[1])) 
+    
+    
+    test_main_func()
