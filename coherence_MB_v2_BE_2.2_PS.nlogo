@@ -15,6 +15,7 @@ turtles-own [
   idno               ;; identity number from data
   belief_vector      ;; a vector of values, each in [-1, 1] representing intensity of attituden
   group              ;; the number of the group it is in
+  coherency          ;; coherency
 ]
 
 links-own [
@@ -202,6 +203,8 @@ to initialize-agents
         set group last line
         if not is-number? group [error (word "Turtle " who " has a group which is not a number")]
         ;show (word "Length: " length(bv) ", Group: " group ", ID: " idno ", Believes: " bv ", Min: " min(bv) ", Max: " max(bv))
+        let matrix table:get coherency_matrices [group] of self ; get correlation matrix of agent's group
+        let c coherence-function matrix belief_vector
       ]
     ])
     file-close
@@ -342,10 +345,6 @@ to-report update_health [last_health recent_coherency]
   report (link_health_ch * recent_coherency) + ((1 - link_health_ch) * last_health)
 end
 
-to-report euclid [one second]
-  ;; work out euclidean distance between two vectors
-  report (sqrt (sum (map [[f l] -> (f - l) ^ 2] one second) / num_items))
-end
 
 to check-self-coherency
   let belief_position random num_items
@@ -357,8 +356,7 @@ to check-self-coherency
 end
 
 to add-new-link   ;; All agents create one or zero new links to a new agent. Note, multiple agents might establish a link with the same agent
-  if max_num_links = 0 or count my-links < max_num_links [  ;; max_num_links = 0 means no maximum
-    let potential_new_neighbors no-turtles
+     let potential_new_neighbors no-turtles
     if prob prob_FoF    ;; with a probability set potential friends to friends of friends
       [set potential_new_neighbors other (turtle-set [link-neighbors] of link-neighbors)]
     if not any? potential_new_neighbors
@@ -371,7 +369,6 @@ to add-new-link   ;; All agents create one or zero new links to a new agent. Not
         set link_health 1
         ]
       ]
-  ]
 end
 
 to-report change-belief [old new group_num belief_position]
@@ -396,7 +393,7 @@ to-report coherence-function [matrix vector]
   ;; and where C-1 is the correlation matrix with 0 on the diagonal (see initialisation), i.e. no bias towards any of the belief.
   let col-vec matrix:from-column-list  ( list vector )    ; this is a (5,1)-matrix (column vector) of the agent's belief
   let row-vec  matrix:from-row-list  ( list vector )      ; this is a (1,5) matrix (row-vector) of the agent's belief
-  let coherency 0.5 * matrix:get ( matrix:times row-vec matrix col-vec ) 0 0  ; do multiplication and extract coherency from (1,1)-matrix
+  set coherency 0.5 * matrix:get ( matrix:times row-vec matrix col-vec ) 0 0  ; do multiplication and extract coherency from (1,1)-matrix
   report coherency
 end
 
@@ -565,10 +562,10 @@ to STORE!
     file-print (word "prob_self_check, " prob_self_check)
     file-print (word "link_health_ch, " link_health_ch)
     file-print (word "drop-bad-link, " drop-bad-link)
-    file-print (word "prob_add_link, " prob_add_link)
+    ;file-print (word "prob_add_link, " prob_add_link)
     file-print (word "prob_FoF, " prob_FoF)
     file-print (word "link_lonely?, " link_lonely?)
-    file-print (word "max_num_links, " max_num_links)
+    ;file-print (word "max_num_links, " max_num_links)
     file-print (word "no_repeat_link?, " no_repeat_link?)
 
     ;; Closing file:
@@ -586,8 +583,8 @@ end
 GRAPHICS-WINDOW
 148
 10
-656
-519
+652
+515
 -1
 -1
 5.2631578947368425
@@ -669,7 +666,7 @@ CHOOSER
 network_type
 network_type
 "Random" "Watts" "Kleinberg" "Barabasi" "Planar" "From File"
-1
+0
 
 SLIDER
 4
@@ -695,7 +692,7 @@ rewiring
 rewiring
 0
 1
-0.001
+0.025
 0.001
 1
 NIL
@@ -721,7 +718,7 @@ clustering_exp
 clustering_exp
 0.01
 10
-0.01
+0.1
 0.01
 1
 NIL
@@ -811,7 +808,7 @@ conformity_tendency
 conformity_tendency
 0
 1
-0.4
+0.2
 0.05
 1
 NIL
@@ -826,7 +823,7 @@ var_of_new_belief
 var_of_new_belief
 0
 1
-0.12
+0.0
 0.01
 1
 NIL
@@ -856,23 +853,8 @@ prob_self_check
 prob_self_check
 0
 1
-0.15
+0.0
 0.05
-1
-NIL
-HORIZONTAL
-
-SLIDER
-979
-144
-1126
-177
-prob_add_link
-prob_add_link
-0
-1
-0.09
-0.01
 1
 NIL
 HORIZONTAL
@@ -886,7 +868,7 @@ drop-bad-link
 drop-bad-link
 0
 1
-0.07
+1.0
 0.01
 1
 NIL
@@ -916,7 +898,7 @@ y_belief
 y_belief
 1
 5
-3.0
+1.0
 1
 1
 NIL
@@ -999,21 +981,6 @@ Agent iniitialisation
 0.0
 1
 
-SLIDER
-979
-248
-1127
-281
-max_num_links
-max_num_links
-0
-20
-10.0
-1
-1
-NIL
-HORIZONTAL
-
 SWITCH
 660
 214
@@ -1046,7 +1013,7 @@ INPUTBOX
 961
 135
 k
-10.0
+100.0
 1
 0
 Number
@@ -1133,7 +1100,7 @@ Histogram Node Arities
 NIL
 NIL
 0.0
-10.0
+20.0
 0.0
 10.0
 true
@@ -1151,7 +1118,7 @@ rearrange_every
 rearrange_every
 0
 100
-77.0
+98.0
 1
 1
 NIL
@@ -1166,7 +1133,7 @@ group_shown
 group_shown
 0
 10
-4.0
+0.0
 1
 1
 NIL
@@ -1252,7 +1219,7 @@ INPUTBOX
 147
 141
 max_time
-1000.0
+3000.0
 1
 0
 Number
@@ -1266,7 +1233,7 @@ link_health_ch
 link_health_ch
 0
 1
-0.42
+0.25
 0.01
 1
 NIL
@@ -1280,15 +1247,16 @@ PLOT
 Histogram Link Health
 NIL
 NIL
--1.0
-1.0
+-2.0
+2.0
 0.0
-10.0
-true
+4000.0
 false
-"set-plot-x-range -1 1\nset-histogram-num-bars 16" ""
+false
+"set-plot-x-range -2 2\nset-histogram-num-bars 41\nset-plot-y-range 0 4000" ""
 PENS
-"default" 1.0 1 -16777216 true "" "histogram [link_health] of links"
+"pen-1" 0.01 0 -2674135 true "auto-plot-off\nlet x -1\nlet y 0\nrepeat 200\n[\nset x x + 0.01\nset y (plot-y-max * ( 1 / ( 1 + (exp ( - x * k_link )) )))\nplotxy x y\n]\nauto-plot-on" ""
+"default" 0.1 1 -16777216 true "" "histogram [link_health] of links\nset-plot-y-range 0 4000"
 
 SWITCH
 981
@@ -1319,7 +1287,7 @@ SWITCH
 323
 store_network?
 store_network?
-1
+0
 1
 -1000
 
@@ -1425,7 +1393,7 @@ SWITCH
 442
 use_random_stamp?
 use_random_stamp?
-0
+1
 1
 -1000
 
@@ -1476,7 +1444,7 @@ INPUTBOX
 1460
 582
 own_stamp
-A00001
+test
 1
 0
 String
@@ -1487,7 +1455,7 @@ INPUTBOX
 896
 133
 k_link
--100.0
+-10.0
 1
 0
 Number
@@ -1501,6 +1469,25 @@ k_link<0!!!
 12
 0.0
 1
+
+PLOT
+1186
+618
+1579
+768
+Histogram agent coherency
+NIL
+NIL
+-2.0
+2.0
+0.0
+300.0
+true
+false
+"set-plot-x-range -2 2\nset-histogram-num-bars 21\n" ""
+PENS
+"default" 1.0 1 -16777216 true "" "histogram [coherency] of turtles"
+"pen-1" 0.01 0 -11221820 true "auto-plot-off\nlet x -1\nlet y 0\nrepeat 200\n[\nset x x + 0.01\nset y (plot-y-max * ( 1 / ( 1 + (exp ( - x * k )) )))\nplotxy x y\n]\nauto-plot-on" ""
 
 @#$#@#$#@
 ## This version (BE)

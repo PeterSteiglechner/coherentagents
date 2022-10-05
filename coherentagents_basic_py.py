@@ -20,7 +20,7 @@ import time
 logistic = lambda x, k: 1/(1+np.exp(-k*x))
 
 class Model:
-    def __init__(self, version, **kwargs) -> None:
+    def __init__(self, version, fnameItems="/items.csv", fnameCorrelations="/correlations.csv", **kwargs) -> None:
         self.errorFlag = False
         self.version = version
         
@@ -53,7 +53,7 @@ class Model:
         if  not ((self.network_type == "random" and ("link_prob" in self.network_params.keys())) or 
           (self.network_type == "watts"  and ("avg_node_degree" in self.network_params.keys()) and ("rewiring_prob" in self.network_params.keys())) ):
             print("ERROR: network parameters or network type"); self.errorFlag = True; return
-        if not os.path.exists(self.country+"/items.csv") or not os.path.exists(self.country+"/correlations.csv"):
+        if not os.path.exists(self.country+fnameItems) or not os.path.exists(self.country+fnameCorrelations):
             print("ERROR: Wrong country, file structure, or missing files items.csv or correlations.csv"); self.errorFlag = True; return
         if self.k_link>0 or self.k_coherence<0:
             print("ERROR: one of the logistic k values is not correct"); self.errorFlag = True; return
@@ -65,7 +65,7 @@ class Model:
 
         # ---- Get correlation matrices from correlations.csv ----
         # Load matrices for different groups from external file. The matrices are stacked on top of each other
-        corr_matrix_data = pd.DataFrame(pd.read_csv(self.country+"/correlations.csv"))
+        corr_matrix_data = pd.DataFrame(pd.read_csv(self.country+fnameCorrelations))
         self.attitude_names = corr_matrix_data["item"][:self.n_attitudes]
         self.n_groups = len(corr_matrix_data)/self.n_attitudes
         if not int(self.n_groups) == self.n_groups:
@@ -83,7 +83,7 @@ class Model:
         # ---- Get init data from items.csv ----
         # initialise agents with beliefs, the corresponding id number, and their group
         if self.init_beliefs=="from_data":
-            surveydata = pd.read_csv(self.country+"/items.csv")
+            surveydata = pd.read_csv(self.country+fnameItems)
             self.groups = surveydata["group"]
             self.n_agents = len(self.groups)
             init_beliefs = surveydata[self.attitude_names].to_numpy()
@@ -276,9 +276,9 @@ class Agent:
 
 # ---- MAIN FUNCTION ----
 
-def simulation(T, track_times, params, verbose=False, save_network=False):
+def simulation(T, track_times, params, verbose=False, save_network=False, fnameItems="/items.csv", fnameCorrelations="/correlations.csv"):
     s0 = time.time()
-    m = Model(**params)
+    m = Model(**params, fnameItems=fnameItems, fnameCorrelations=fnameCorrelations)
     if not m.errorFlag:
         if verbose: print("Setup DONE")
         results, results_network = m.run(T, track_times, verbose=verbose,save_network=save_network)

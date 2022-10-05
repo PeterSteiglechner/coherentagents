@@ -335,11 +335,6 @@ to-report update_health [last_health recent_coherency]
   report (link_health_ch * recent_coherency) + ((1 - link_health_ch) * last_health)
 end
 
-to-report euclid [one second]
-  ;; work out euclidean distance between two vectors
-  report (sqrt (sum (map [[f l] -> (f - l) ^ 2] one second) / num_items))
-end
-
 to check-self-coherency
   let belief_position random num_items
   let focal_belief item belief_position belief_vector
@@ -544,7 +539,7 @@ to STORE!
     file-print (word "neis, " neis)
     file-print (word "rewiring, " rewiring)
     file-print (word "toroidial_world?, " toroidial_world?)
-    file-print (word "clustering_exp, " clustering_exp)
+    ;file-print (word "clustering_exp, " clustering_exp)
     ;file-print (word "Initial_link_goodness, " Initial_link_goodness)
     file-print (word "set_agents, " set_agents)
     file-print (word "network_file, " network_file)
@@ -579,8 +574,8 @@ end
 GRAPHICS-WINDOW
 148
 10
-655
-518
+656
+519
 -1
 -1
 5.2631578947368425
@@ -665,15 +660,15 @@ network_type
 1
 
 SLIDER
-4
-241
-142
-274
+5
+276
+143
+309
 neis
 neis
 1
 50
-19.0
+10.0
 1
 1
 NIL
@@ -681,24 +676,24 @@ HORIZONTAL
 
 SLIDER
 4
-275
+337
 146
-308
+370
 rewiring
 rewiring
 0
 1
-0.001
+0.1
 0.001
 1
 NIL
 HORIZONTAL
 
 SWITCH
-3
-309
-146
-342
+2
+398
+145
+431
 toroidial_world?
 toroidial_world?
 1
@@ -706,30 +701,15 @@ toroidial_world?
 -1000
 
 SLIDER
-3
-343
-146
-376
-clustering_exp
-clustering_exp
-0.01
-10
-0.01
-0.01
-1
-NIL
-HORIZONTAL
-
-SLIDER
 4
-207
+224
 143
-240
+257
 min_degree
 min_degree
 1
 10
-2.0
+1.0
 1
 1
 NIL
@@ -804,7 +784,7 @@ conformity_tendency
 conformity_tendency
 0
 1
-0.4
+0.3
 0.05
 1
 NIL
@@ -819,7 +799,7 @@ var_of_new_belief
 var_of_new_belief
 0
 1
-0.12
+0.0
 0.01
 1
 NIL
@@ -834,7 +814,7 @@ prob_soc_infl
 prob_soc_infl
 0
 1
-0.1
+1.0
 0.05
 1
 NIL
@@ -849,7 +829,7 @@ prob_self_check
 prob_self_check
 0
 1
-0.15
+0.0
 0.05
 1
 NIL
@@ -864,7 +844,7 @@ prob_add_link
 prob_add_link
 0
 1
-0.09
+0.0
 0.01
 1
 NIL
@@ -879,7 +859,7 @@ drop-bad-link
 drop-bad-link
 0
 1
-0.07
+0.0
 0.01
 1
 NIL
@@ -909,7 +889,7 @@ y_belief
 y_belief
 1
 5
-5.0
+1.0
 1
 1
 NIL
@@ -1001,7 +981,7 @@ max_num_links
 max_num_links
 0
 20
-10.0
+20.0
 1
 1
 NIL
@@ -1014,7 +994,7 @@ SWITCH
 247
 show-new-links?
 show-new-links?
-0
+1
 1
 -1000
 
@@ -1039,7 +1019,7 @@ INPUTBOX
 961
 135
 k
-10.0
+100.0
 1
 0
 Number
@@ -1057,7 +1037,7 @@ INPUTBOX
 79
 141
 rand-seed
-12.0
+42.0
 1
 0
 Number
@@ -1113,7 +1093,7 @@ SWITCH
 573
 visualisations?
 visualisations?
-0
+1
 1
 -1000
 
@@ -1144,7 +1124,7 @@ rearrange_every
 rearrange_every
 0
 100
-0.0
+100.0
 1
 1
 NIL
@@ -1245,20 +1225,10 @@ INPUTBOX
 147
 141
 max_time
-1000.0
+200.0
 1
 0
 Number
-
-TEXTBOX
-10
-385
-104
-403
-Link initialisation
-11
-0.0
-1
 
 SLIDER
 977
@@ -1269,7 +1239,7 @@ link_health_ch
 link_health_ch
 0
 1
-0.42
+0.0
 0.01
 1
 NIL
@@ -1501,6 +1471,36 @@ TEXTBOX
 983
 153
 k_link<0!!!
+12
+0.0
+1
+
+TEXTBOX
+8
+319
+171
+337
+For Watts & Random
+12
+0.0
+1
+
+TEXTBOX
+12
+261
+162
+279
+For Watts only
+12
+0.0
+1
+
+TEXTBOX
+8
+208
+158
+226
+For Barabasi & Planar
 12
 0.0
 1
