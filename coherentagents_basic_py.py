@@ -71,14 +71,14 @@ class Model:
         if not int(self.n_groups) == self.n_groups:
             # n_groups is not an integer. 
             print("ERROR: in reading the matrix. Correlation matrices do not match nr_groups * nr_attitudes"); self.errorFlag = True; return
-        self.matrix_list = []                           # store the correlation matrices
+        self.matrix_dict = {}                           # store the correlation matrices
         for i in range(int(self.n_groups)):
             # take entries from i * n_attitudes to (i+1) * n_attitudes, e.g. for n_attitudes=5: from 0 to 4, from 5 to 9, ... for n_groups times.
             matrix = corr_matrix_data[self.attitude_names].iloc[range(i*self.n_attitudes, (i+1)*self.n_attitudes)]
             matrix["index"] = self.attitude_names
             matrix = matrix.set_index("index")
             matrix_with_zero_diag = matrix - np.diag(np.ones(self.n_attitudes))       # set diagonal to zero.
-            self.matrix_list.append(matrix_with_zero_diag)
+            self.matrix_dict[corr_matrix_data.group[i*self.n_attitudes]] = matrix_with_zero_diag
         
         # ---- Get init data from items.csv ----
         # initialise agents with beliefs, the corresponding id number, and their group
@@ -252,7 +252,7 @@ class Agent:
         c = 0.5 * b.T * (CMat-1) * b 
         e.g. for n_attitudes=2: b = (x,y) and CMat-1 = ( (0, r); (r, 0)), then c = 0.5 * (x*r*y + y*r*x) = r*x*y
         """
-        return 1/2 *np.dot(belief_vec.T, np.dot(self.model.matrix_list[self.group], belief_vec))
+        return 1/2 *np.dot(belief_vec.T, np.dot(self.model.matrix_dict[self.group], belief_vec))
     
     def self_check(self) -> None:
         discussion_topic = int(np.random.random() * self.model.n_attitudes) 
