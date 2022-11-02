@@ -413,12 +413,29 @@ to __VIS+GRAPH_procedures end
 
 to visualize
   if not visualisations? [stop]
-  set-current-plot "attitude space"
+  set-current-plot "attitude space 2d"
   clear-plot
   set-plot-background-color 0
   ask turtles [
-    set-plot-pen-color (group * 10) + 5
+    set-plot-pen-color (group * 20) + 5
     plotxy (some_fuzz + item (x_belief - 1) belief_vector) (some_fuzz + item (y_belief  - 1) belief_vector)
+  ]
+
+  set-current-plot "attitude space 1d"
+  clear-plot
+  set-plot-background-color 0
+  ask turtles [
+    set-plot-pen-color (group * 20) + 5
+    plotxy (some_fuzz + group / max [group] of turtles) (some_fuzz + item (belief_shown  - 1) belief_vector)
+  ]
+
+  set-current-plot "topics"
+  clear-plot
+  set-plot-background-color 0
+  ask ifelse-value (only_group_shown) [turtles with [group = group_shown]] [turtles] [
+    set-plot-pen-color (group * 20) + 5
+    (foreach (n-values length belief_vector [ i -> (i + 0.5) / length belief_vector ]) (belief_vector) [ [x y] -> plotxy x + some_fuzz y])
+    ; plotxy (some_fuzz + group / max [group] of turtles) (some_fuzz + item (y_belief  - 1) belief_vector)
   ]
 
   set-current-plot "Attitude Dynamics"
@@ -427,7 +444,7 @@ to visualize
     [set ts turtles]
     [set ts turtles with [group = group_shown]]
   ask ts [
-    set-plot-pen-color (group * 10) + 5
+    set-plot-pen-color (group * 20) + 5
     plotxy ticks item (belief_shown - 1) belief_vector
   ]
 end
@@ -712,7 +729,7 @@ SWITCH
 342
 toroidial_world?
 toroidial_world?
-1
+0
 1
 -1000
 
@@ -725,7 +742,7 @@ clustering_exp
 clustering_exp
 0.01
 10
-0.01
+0.97
 0.01
 1
 NIL
@@ -740,7 +757,11 @@ min_degree
 min_degree
 1
 10
+<<<<<<< HEAD
 1.0
+=======
+10.0
+>>>>>>> 3c7c9d49ba6dcc80fa95ea93737421a62badbe29
 1
 1
 NIL
@@ -860,7 +881,11 @@ prob_self_check
 prob_self_check
 0
 1
+<<<<<<< HEAD
 0.5
+=======
+0.0
+>>>>>>> 3c7c9d49ba6dcc80fa95ea93737421a62badbe29
 0.05
 1
 NIL
@@ -920,7 +945,7 @@ y_belief
 y_belief
 1
 5
-2.0
+3.0
 1
 1
 NIL
@@ -931,7 +956,7 @@ PLOT
 685
 1128
 1020
-attitude space
+attitude space 2d
 NIL
 NIL
 -1.05
@@ -1012,7 +1037,11 @@ max_num_links
 max_num_links
 0
 20
+<<<<<<< HEAD
 20.0
+=======
+4.0
+>>>>>>> 3c7c9d49ba6dcc80fa95ea93737421a62badbe29
 1
 1
 NIL
@@ -1038,7 +1067,7 @@ fuzz
 fuzz
 0
 0.025
-0.0
+0.025
 0.001
 1
 NIL
@@ -1093,7 +1122,11 @@ belief_shown
 belief_shown
 1
 5
+<<<<<<< HEAD
 4.0
+=======
+3.0
+>>>>>>> 3c7c9d49ba6dcc80fa95ea93737421a62badbe29
 1
 1
 NIL
@@ -1170,7 +1203,7 @@ group_shown
 group_shown
 0
 10
-3.0
+6.0
 1
 1
 NIL
@@ -1311,7 +1344,7 @@ SWITCH
 318
 no_repeat_link?
 no_repeat_link?
-1
+0
 1
 -1000
 
@@ -1540,9 +1573,9 @@ diversity
 
 PLOT
 1225
-613
-1425
-763
+589
+1475
+709
 Output Measures
 NIL
 NIL
@@ -1551,11 +1584,159 @@ NIL
 0.0
 1.0
 true
-false
+true
 "" ""
 PENS
 "extremness" 1.0 0 -16777216 true "" "plot extremness"
 "diversity" 1.0 0 -7500403 true "" "plot diversity"
+
+PLOT
+1233
+718
+1433
+868
+Group Output Measures
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot count turtles"
+
+BUTTON
+1840
+663
+1930
+697
+NIL
+visualize
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+PLOT
+1508
+50
+1804
+258
+attitude space 1d
+group
+belief_shown
+0.05
+1.05
+-1.05
+1.05
+false
+false
+"" ""
+PENS
+"default" 1.0 2 -16777216 true "" ""
+
+PLOT
+1508
+270
+1803
+515
+topics
+topic
+belief
+0.0
+1.05
+-1.05
+1.05
+false
+false
+"" ""
+PENS
+"default" 1.0 2 -16777216 true "" ""
+
+PLOT
+1512
+582
+1802
+732
+extremeness topics
+NIL
+NIL
+0.0
+10.0
+0.0
+1.0
+true
+true
+"" ""
+PENS
+"topic1" 1.0 0 -16777216 true "" "plot mean [abs item 0 belief_vector] of turtles"
+"topic2" 1.0 0 -2674135 true "" "plot mean [abs item 1 belief_vector] of turtles"
+"topic3" 1.0 0 -6459832 true "" "plot mean [abs item 2 belief_vector] of turtles"
+"topic4" 1.0 0 -10899396 true "" "plot mean [abs item 3 belief_vector] of turtles"
+"topic5" 1.0 0 -14835848 true "" "plot mean [abs item 4 belief_vector] of turtles"
+
+PLOT
+1508
+735
+1802
+885
+sd topics
+NIL
+NIL
+0.0
+10.0
+0.0
+1.0
+true
+true
+"" ""
+PENS
+"topic1" 1.0 0 -16777216 true "" "plot standard-deviation [item 0 belief_vector] of turtles"
+"topic2" 1.0 0 -2674135 true "" "plot standard-deviation [item 1 belief_vector] of turtles"
+"topic3" 1.0 0 -6459832 true "" "plot standard-deviation [item 2 belief_vector] of turtles"
+"topic4" 1.0 0 -8732573 true "" "plot standard-deviation [item 3 belief_vector] of turtles"
+"topic5" 1.0 0 -14835848 true "" "plot standard-deviation [item 4 belief_vector] of turtles"
+
+SWITCH
+1508
+515
+1695
+549
+only_group_shown
+only_group_shown
+1
+1
+-1000
+
+MONITOR
+1803
+50
+1861
+96
+topic
+belief_shown
+17
+1
+11
+
+MONITOR
+1695
+514
+1753
+560
+group
+ifelse-value (only_group_shown) [group_shown] [\"all\"]
+17
+1
+11
 
 @#$#@#$#@
 ## This version (BE)
