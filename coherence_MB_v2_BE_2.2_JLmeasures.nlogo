@@ -684,7 +684,7 @@ neis
 neis
 1
 50
-19.0
+10.0
 1
 1
 NIL
@@ -699,7 +699,7 @@ rewiring
 rewiring
 0
 1
-0.001
+0.1
 0.001
 1
 NIL
@@ -740,7 +740,7 @@ min_degree
 min_degree
 1
 10
-9.0
+1.0
 1
 1
 NIL
@@ -790,7 +790,7 @@ INPUTBOX
 973
 70
 agent_data
-DE/items.csv
+DE/itemsCCA.csv
 1
 0
 String
@@ -801,7 +801,7 @@ INPUTBOX
 1126
 70
 corol_mat_file
-DE/correlations.csv
+DE/correlationsCCA.csv
 1
 0
 String
@@ -815,7 +815,7 @@ conformity_tendency
 conformity_tendency
 0
 1
-0.4
+0.2
 0.05
 1
 NIL
@@ -830,7 +830,7 @@ var_of_new_belief
 var_of_new_belief
 0
 1
-0.12
+0.1
 0.01
 1
 NIL
@@ -845,7 +845,7 @@ prob_soc_infl
 prob_soc_infl
 0
 1
-0.1
+0.5
 0.05
 1
 NIL
@@ -860,7 +860,7 @@ prob_self_check
 prob_self_check
 0
 1
-0.15
+0.5
 0.05
 1
 NIL
@@ -875,7 +875,7 @@ prob_add_link
 prob_add_link
 0
 1
-0.09
+0.05
 0.01
 1
 NIL
@@ -890,7 +890,7 @@ drop-bad-link
 drop-bad-link
 0
 1
-0.07
+0.3
 0.01
 1
 NIL
@@ -905,7 +905,7 @@ x_belief
 x_belief
 1
 5
-1.0
+3.0
 1
 1
 NIL
@@ -1012,7 +1012,7 @@ max_num_links
 max_num_links
 0
 20
-10.0
+20.0
 1
 1
 NIL
@@ -1025,7 +1025,7 @@ SWITCH
 247
 show-new-links?
 show-new-links?
-0
+1
 1
 -1000
 
@@ -1050,7 +1050,7 @@ INPUTBOX
 978
 135
 k
-10.0
+20.0
 1
 0
 Number
@@ -1068,7 +1068,7 @@ INPUTBOX
 79
 141
 rand-seed
-12.0
+202.0
 1
 0
 Number
@@ -1093,7 +1093,7 @@ belief_shown
 belief_shown
 1
 5
-5.0
+4.0
 1
 1
 NIL
@@ -1213,7 +1213,7 @@ prob_FoF
 prob_FoF
 0
 1
-0.0
+0.3
 0.01
 1
 NIL
@@ -1256,7 +1256,7 @@ INPUTBOX
 147
 141
 max_time
-1000.0
+300.0
 1
 0
 Number
@@ -1280,7 +1280,7 @@ link_health_ch
 link_health_ch
 0
 1
-0.42
+0.3
 0.01
 1
 NIL
@@ -1501,7 +1501,7 @@ INPUTBOX
 896
 133
 k_link
--100.0
+-20.0
 1
 0
 Number
@@ -2013,7 +2013,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.2.2
+NetLogo 6.2.0
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
