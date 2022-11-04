@@ -53,7 +53,7 @@ checkGroups <- function (df, attitudenames = c("freehms", "gincdif", "lrscale", 
 computeCorrelationsPerGroup <- function(df, attitudenames = c("freehms", "gincdif", "lrscale", "impcntr", "euftf")) {
   df <- df |> filter(cluster_exclusion==F)
   df_matrix <- tibble()
-  for (i in unique(df$group)) {
+  for (i in sort(unique(df$group))) {
     df_matrix_temp <- 
       df |> filter(group == i) |> select(attitudenames) |>  
       cor() |> as_tibble() |> 
