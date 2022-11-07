@@ -1178,7 +1178,7 @@ INPUTBOX
 978
 135
 k
-20.0
+81.0
 1
 0
 Number
@@ -1196,7 +1196,7 @@ INPUTBOX
 79
 141
 rand-seed
-13.0
+2.0
 1
 0
 Number
@@ -3763,6 +3763,1086 @@ NetLogo 6.2.2
       <value value="0.5"/>
       <value value="0.55"/>
       <value value="0.6"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="set_agents">
+      <value value="&quot;From File&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="corol_mat_file">
+      <value value="&quot;DE/correlationsCCA.csv&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="agent_data">
+      <value value="&quot;DE/itemsCCA.csv&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="link_health_ch">
+      <value value="0.3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="drop-bad-link">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="prob_add_link">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="prob_FoF">
+      <value value="0.3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="link_lonely?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="max_num_links">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="no_repeat_link?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="visualisations?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="rearrange_every">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="show-old-links?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="show-new-links?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="only_group_shown">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="network_type">
+      <value value="&quot;Watts&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="rewiring">
+      <value value="0.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="neis">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="min_degree">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="clustering_exp">
+      <value value="0.01"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="toroidial_world?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="belief_shown">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="x_belief">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="y_belief">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="fuzz">
+      <value value="0.025"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="group_shown">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="own_stamp">
+      <value value="&quot;A00001&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="store_agents?">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="network_file">
+      <value value="&quot;network.txt&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="main_folder">
+      <value value="&quot;&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="store_metadata?">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="store_agents_filename">
+      <value value="&quot;agent-data&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="store_network_filename">
+      <value value="&quot;network-data&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="storing_folder">
+      <value value="&quot;&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="store_metadata_filename">
+      <value value="&quot;meta-data&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="use_random_stamp?">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="store_network?">
+      <value value="false"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="socInfluence-staticNetwork-groups_WIDE" repetitions="1" runMetricsEveryStep="false">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="201"/>
+    <metric>ticks</metric>
+    <metric>extremness</metric>
+    <metric>diversity</metric>
+    <metric>g1_ex</metric>
+    <metric>g1_dv</metric>
+    <metric>g2_ex</metric>
+    <metric>g2_dv</metric>
+    <metric>g3_ex</metric>
+    <metric>g3_dv</metric>
+    <metric>g4_ex</metric>
+    <metric>g4_dv</metric>
+    <metric>g5_ex</metric>
+    <metric>g5_dv</metric>
+    <metric>g6_ex</metric>
+    <metric>g6_dv</metric>
+    <metric>g7_ex</metric>
+    <metric>g7_dv</metric>
+    <metric>g8_ex</metric>
+    <metric>g8_dv</metric>
+    <metric>g9_ex</metric>
+    <metric>g9_dv</metric>
+    <metric>g10_ex</metric>
+    <metric>g10_dv</metric>
+    <metric>g11_ex</metric>
+    <metric>g11_dv</metric>
+    <metric>g12_ex</metric>
+    <metric>g12_dv</metric>
+    <steppedValueSet variable="rand-seed" first="1" step="1" last="20"/>
+    <enumeratedValueSet variable="max_time">
+      <value value="200"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="k_link">
+      <value value="-1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="k">
+      <value value="20"/>
+      <value value="100"/>
+      <value value="10"/>
+      <value value="1"/>
+      <value value="0.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="conformity_tendency">
+      <value value="0.2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="var_of_new_belief">
+      <value value="0.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="prob_soc_infl">
+      <value value="0.1"/>
+      <value value="0.25"/>
+      <value value="0.75"/>
+      <value value="0.9"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="prob_self_check">
+      <value value="0.5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="set_agents">
+      <value value="&quot;From File&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="corol_mat_file">
+      <value value="&quot;DE/correlationsCCA.csv&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="agent_data">
+      <value value="&quot;DE/itemsCCA.csv&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="link_health_ch">
+      <value value="0.3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="drop-bad-link">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="prob_add_link">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="prob_FoF">
+      <value value="0.3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="link_lonely?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="max_num_links">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="no_repeat_link?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="visualisations?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="rearrange_every">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="show-old-links?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="show-new-links?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="only_group_shown">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="network_type">
+      <value value="&quot;Watts&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="rewiring">
+      <value value="0.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="neis">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="min_degree">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="clustering_exp">
+      <value value="0.01"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="toroidial_world?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="belief_shown">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="x_belief">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="y_belief">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="fuzz">
+      <value value="0.025"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="group_shown">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="own_stamp">
+      <value value="&quot;A00001&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="store_agents?">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="network_file">
+      <value value="&quot;network.txt&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="main_folder">
+      <value value="&quot;&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="store_metadata?">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="store_agents_filename">
+      <value value="&quot;agent-data&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="store_network_filename">
+      <value value="&quot;network-data&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="storing_folder">
+      <value value="&quot;&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="store_metadata_filename">
+      <value value="&quot;meta-data&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="use_random_stamp?">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="store_network?">
+      <value value="false"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="selfCheck-staticNetwork-groups_WIDE" repetitions="1" runMetricsEveryStep="false">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="201"/>
+    <metric>ticks</metric>
+    <metric>extremness</metric>
+    <metric>diversity</metric>
+    <metric>g1_ex</metric>
+    <metric>g1_dv</metric>
+    <metric>g2_ex</metric>
+    <metric>g2_dv</metric>
+    <metric>g3_ex</metric>
+    <metric>g3_dv</metric>
+    <metric>g4_ex</metric>
+    <metric>g4_dv</metric>
+    <metric>g5_ex</metric>
+    <metric>g5_dv</metric>
+    <metric>g6_ex</metric>
+    <metric>g6_dv</metric>
+    <metric>g7_ex</metric>
+    <metric>g7_dv</metric>
+    <metric>g8_ex</metric>
+    <metric>g8_dv</metric>
+    <metric>g9_ex</metric>
+    <metric>g9_dv</metric>
+    <metric>g10_ex</metric>
+    <metric>g10_dv</metric>
+    <metric>g11_ex</metric>
+    <metric>g11_dv</metric>
+    <metric>g12_ex</metric>
+    <metric>g12_dv</metric>
+    <steppedValueSet variable="rand-seed" first="1" step="1" last="20"/>
+    <enumeratedValueSet variable="max_time">
+      <value value="200"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="k_link">
+      <value value="-1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="k">
+      <value value="20"/>
+      <value value="100"/>
+      <value value="10"/>
+      <value value="1"/>
+      <value value="0.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="conformity_tendency">
+      <value value="0.2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="var_of_new_belief">
+      <value value="0.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="prob_soc_infl">
+      <value value="0.5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="prob_self_check">
+      <value value="0.1"/>
+      <value value="0.25"/>
+      <value value="0.75"/>
+      <value value="0.9"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="set_agents">
+      <value value="&quot;From File&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="corol_mat_file">
+      <value value="&quot;DE/correlationsCCA.csv&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="agent_data">
+      <value value="&quot;DE/itemsCCA.csv&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="link_health_ch">
+      <value value="0.3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="drop-bad-link">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="prob_add_link">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="prob_FoF">
+      <value value="0.3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="link_lonely?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="max_num_links">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="no_repeat_link?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="visualisations?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="rearrange_every">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="show-old-links?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="show-new-links?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="only_group_shown">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="network_type">
+      <value value="&quot;Watts&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="rewiring">
+      <value value="0.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="neis">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="min_degree">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="clustering_exp">
+      <value value="0.01"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="toroidial_world?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="belief_shown">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="x_belief">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="y_belief">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="fuzz">
+      <value value="0.025"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="group_shown">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="own_stamp">
+      <value value="&quot;A00001&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="store_agents?">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="network_file">
+      <value value="&quot;network.txt&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="main_folder">
+      <value value="&quot;&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="store_metadata?">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="store_agents_filename">
+      <value value="&quot;agent-data&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="store_network_filename">
+      <value value="&quot;network-data&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="storing_folder">
+      <value value="&quot;&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="store_metadata_filename">
+      <value value="&quot;meta-data&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="use_random_stamp?">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="store_network?">
+      <value value="false"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="kHunt-staticNetwork-groups" repetitions="1" runMetricsEveryStep="false">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="201"/>
+    <metric>ticks</metric>
+    <metric>extremness</metric>
+    <metric>diversity</metric>
+    <metric>g1_ex</metric>
+    <metric>g1_dv</metric>
+    <metric>g2_ex</metric>
+    <metric>g2_dv</metric>
+    <metric>g3_ex</metric>
+    <metric>g3_dv</metric>
+    <metric>g4_ex</metric>
+    <metric>g4_dv</metric>
+    <metric>g5_ex</metric>
+    <metric>g5_dv</metric>
+    <metric>g6_ex</metric>
+    <metric>g6_dv</metric>
+    <metric>g7_ex</metric>
+    <metric>g7_dv</metric>
+    <metric>g8_ex</metric>
+    <metric>g8_dv</metric>
+    <metric>g9_ex</metric>
+    <metric>g9_dv</metric>
+    <metric>g10_ex</metric>
+    <metric>g10_dv</metric>
+    <metric>g11_ex</metric>
+    <metric>g11_dv</metric>
+    <metric>g12_ex</metric>
+    <metric>g12_dv</metric>
+    <steppedValueSet variable="rand-seed" first="1" step="1" last="5"/>
+    <enumeratedValueSet variable="max_time">
+      <value value="200"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="k_link">
+      <value value="-1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="k">
+      <value value="100"/>
+      <value value="90"/>
+      <value value="81"/>
+      <value value="74"/>
+      <value value="67"/>
+      <value value="60"/>
+      <value value="55"/>
+      <value value="49"/>
+      <value value="45"/>
+      <value value="40"/>
+      <value value="37"/>
+      <value value="33"/>
+      <value value="30"/>
+      <value value="27"/>
+      <value value="25"/>
+      <value value="22"/>
+      <value value="20"/>
+      <value value="18"/>
+      <value value="16"/>
+      <value value="15"/>
+      <value value="13"/>
+      <value value="12"/>
+      <value value="11"/>
+      <value value="10"/>
+      <value value="9"/>
+      <value value="8"/>
+      <value value="7"/>
+      <value value="6"/>
+      <value value="5"/>
+      <value value="4"/>
+      <value value="3"/>
+      <value value="2"/>
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="conformity_tendency">
+      <value value="0.2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="var_of_new_belief">
+      <value value="0.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="prob_soc_infl">
+      <value value="0.5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="prob_self_check">
+      <value value="0.5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="set_agents">
+      <value value="&quot;From File&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="corol_mat_file">
+      <value value="&quot;DE/correlationsCCA.csv&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="agent_data">
+      <value value="&quot;DE/itemsCCA.csv&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="link_health_ch">
+      <value value="0.3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="drop-bad-link">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="prob_add_link">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="prob_FoF">
+      <value value="0.3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="link_lonely?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="max_num_links">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="no_repeat_link?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="visualisations?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="rearrange_every">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="show-old-links?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="show-new-links?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="only_group_shown">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="network_type">
+      <value value="&quot;Watts&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="rewiring">
+      <value value="0.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="neis">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="min_degree">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="clustering_exp">
+      <value value="0.01"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="toroidial_world?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="belief_shown">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="x_belief">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="y_belief">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="fuzz">
+      <value value="0.025"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="group_shown">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="own_stamp">
+      <value value="&quot;A00001&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="store_agents?">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="network_file">
+      <value value="&quot;network.txt&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="main_folder">
+      <value value="&quot;&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="store_metadata?">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="store_agents_filename">
+      <value value="&quot;agent-data&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="store_network_filename">
+      <value value="&quot;network-data&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="storing_folder">
+      <value value="&quot;&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="store_metadata_filename">
+      <value value="&quot;meta-data&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="use_random_stamp?">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="store_network?">
+      <value value="false"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="kHunt-staticNetwork-groups_MORE" repetitions="1" runMetricsEveryStep="false">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="201"/>
+    <metric>ticks</metric>
+    <metric>extremness</metric>
+    <metric>diversity</metric>
+    <metric>g1_ex</metric>
+    <metric>g1_dv</metric>
+    <metric>g2_ex</metric>
+    <metric>g2_dv</metric>
+    <metric>g3_ex</metric>
+    <metric>g3_dv</metric>
+    <metric>g4_ex</metric>
+    <metric>g4_dv</metric>
+    <metric>g5_ex</metric>
+    <metric>g5_dv</metric>
+    <metric>g6_ex</metric>
+    <metric>g6_dv</metric>
+    <metric>g7_ex</metric>
+    <metric>g7_dv</metric>
+    <metric>g8_ex</metric>
+    <metric>g8_dv</metric>
+    <metric>g9_ex</metric>
+    <metric>g9_dv</metric>
+    <metric>g10_ex</metric>
+    <metric>g10_dv</metric>
+    <metric>g11_ex</metric>
+    <metric>g11_dv</metric>
+    <metric>g12_ex</metric>
+    <metric>g12_dv</metric>
+    <steppedValueSet variable="rand-seed" first="6" step="1" last="30"/>
+    <enumeratedValueSet variable="max_time">
+      <value value="200"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="k_link">
+      <value value="-1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="k">
+      <value value="100"/>
+      <value value="90"/>
+      <value value="81"/>
+      <value value="74"/>
+      <value value="67"/>
+      <value value="60"/>
+      <value value="55"/>
+      <value value="49"/>
+      <value value="45"/>
+      <value value="40"/>
+      <value value="37"/>
+      <value value="33"/>
+      <value value="30"/>
+      <value value="27"/>
+      <value value="25"/>
+      <value value="22"/>
+      <value value="20"/>
+      <value value="18"/>
+      <value value="16"/>
+      <value value="15"/>
+      <value value="13"/>
+      <value value="12"/>
+      <value value="11"/>
+      <value value="10"/>
+      <value value="9"/>
+      <value value="8"/>
+      <value value="7"/>
+      <value value="6"/>
+      <value value="5"/>
+      <value value="4"/>
+      <value value="3"/>
+      <value value="2"/>
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="conformity_tendency">
+      <value value="0.2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="var_of_new_belief">
+      <value value="0.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="prob_soc_infl">
+      <value value="0.5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="prob_self_check">
+      <value value="0.5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="set_agents">
+      <value value="&quot;From File&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="corol_mat_file">
+      <value value="&quot;DE/correlationsCCA.csv&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="agent_data">
+      <value value="&quot;DE/itemsCCA.csv&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="link_health_ch">
+      <value value="0.3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="drop-bad-link">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="prob_add_link">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="prob_FoF">
+      <value value="0.3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="link_lonely?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="max_num_links">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="no_repeat_link?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="visualisations?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="rearrange_every">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="show-old-links?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="show-new-links?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="only_group_shown">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="network_type">
+      <value value="&quot;Watts&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="rewiring">
+      <value value="0.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="neis">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="min_degree">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="clustering_exp">
+      <value value="0.01"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="toroidial_world?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="belief_shown">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="x_belief">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="y_belief">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="fuzz">
+      <value value="0.025"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="group_shown">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="own_stamp">
+      <value value="&quot;A00001&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="store_agents?">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="network_file">
+      <value value="&quot;network.txt&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="main_folder">
+      <value value="&quot;&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="store_metadata?">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="store_agents_filename">
+      <value value="&quot;agent-data&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="store_network_filename">
+      <value value="&quot;network-data&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="storing_folder">
+      <value value="&quot;&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="store_metadata_filename">
+      <value value="&quot;meta-data&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="use_random_stamp?">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="store_network?">
+      <value value="false"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="conformity-staticNetwork-groups_WIDE" repetitions="1" runMetricsEveryStep="false">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="201"/>
+    <metric>ticks</metric>
+    <metric>extremness</metric>
+    <metric>diversity</metric>
+    <metric>g1_ex</metric>
+    <metric>g1_dv</metric>
+    <metric>g2_ex</metric>
+    <metric>g2_dv</metric>
+    <metric>g3_ex</metric>
+    <metric>g3_dv</metric>
+    <metric>g4_ex</metric>
+    <metric>g4_dv</metric>
+    <metric>g5_ex</metric>
+    <metric>g5_dv</metric>
+    <metric>g6_ex</metric>
+    <metric>g6_dv</metric>
+    <metric>g7_ex</metric>
+    <metric>g7_dv</metric>
+    <metric>g8_ex</metric>
+    <metric>g8_dv</metric>
+    <metric>g9_ex</metric>
+    <metric>g9_dv</metric>
+    <metric>g10_ex</metric>
+    <metric>g10_dv</metric>
+    <metric>g11_ex</metric>
+    <metric>g11_dv</metric>
+    <metric>g12_ex</metric>
+    <metric>g12_dv</metric>
+    <steppedValueSet variable="rand-seed" first="1" step="1" last="20"/>
+    <enumeratedValueSet variable="max_time">
+      <value value="200"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="k_link">
+      <value value="-1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="k">
+      <value value="100"/>
+      <value value="20"/>
+      <value value="10"/>
+      <value value="1"/>
+      <value value="0.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="conformity_tendency">
+      <value value="0.5"/>
+      <value value="0.7"/>
+      <value value="0.9"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="var_of_new_belief">
+      <value value="0.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="prob_soc_infl">
+      <value value="0.5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="prob_self_check">
+      <value value="0.5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="set_agents">
+      <value value="&quot;From File&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="corol_mat_file">
+      <value value="&quot;DE/correlationsCCA.csv&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="agent_data">
+      <value value="&quot;DE/itemsCCA.csv&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="link_health_ch">
+      <value value="0.3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="drop-bad-link">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="prob_add_link">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="prob_FoF">
+      <value value="0.3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="link_lonely?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="max_num_links">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="no_repeat_link?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="visualisations?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="rearrange_every">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="show-old-links?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="show-new-links?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="only_group_shown">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="network_type">
+      <value value="&quot;Watts&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="rewiring">
+      <value value="0.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="neis">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="min_degree">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="clustering_exp">
+      <value value="0.01"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="toroidial_world?">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="belief_shown">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="x_belief">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="y_belief">
+      <value value="3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="fuzz">
+      <value value="0.025"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="group_shown">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="own_stamp">
+      <value value="&quot;A00001&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="store_agents?">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="network_file">
+      <value value="&quot;network.txt&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="main_folder">
+      <value value="&quot;&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="store_metadata?">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="store_agents_filename">
+      <value value="&quot;agent-data&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="store_network_filename">
+      <value value="&quot;network-data&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="storing_folder">
+      <value value="&quot;&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="store_metadata_filename">
+      <value value="&quot;meta-data&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="use_random_stamp?">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="store_network?">
+      <value value="false"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="variability-staticNetwork-groups_WIDE" repetitions="1" runMetricsEveryStep="false">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="201"/>
+    <metric>ticks</metric>
+    <metric>extremness</metric>
+    <metric>diversity</metric>
+    <metric>g1_ex</metric>
+    <metric>g1_dv</metric>
+    <metric>g2_ex</metric>
+    <metric>g2_dv</metric>
+    <metric>g3_ex</metric>
+    <metric>g3_dv</metric>
+    <metric>g4_ex</metric>
+    <metric>g4_dv</metric>
+    <metric>g5_ex</metric>
+    <metric>g5_dv</metric>
+    <metric>g6_ex</metric>
+    <metric>g6_dv</metric>
+    <metric>g7_ex</metric>
+    <metric>g7_dv</metric>
+    <metric>g8_ex</metric>
+    <metric>g8_dv</metric>
+    <metric>g9_ex</metric>
+    <metric>g9_dv</metric>
+    <metric>g10_ex</metric>
+    <metric>g10_dv</metric>
+    <metric>g11_ex</metric>
+    <metric>g11_dv</metric>
+    <metric>g12_ex</metric>
+    <metric>g12_dv</metric>
+    <steppedValueSet variable="rand-seed" first="1" step="1" last="20"/>
+    <enumeratedValueSet variable="max_time">
+      <value value="200"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="k_link">
+      <value value="-1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="k">
+      <value value="20"/>
+      <value value="100"/>
+      <value value="10"/>
+      <value value="1"/>
+      <value value="0.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="conformity_tendency">
+      <value value="0.2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="var_of_new_belief">
+      <value value="0.4"/>
+      <value value="0.6"/>
+      <value value="0.8"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="prob_soc_infl">
+      <value value="0.5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="prob_self_check">
+      <value value="0.5"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="set_agents">
       <value value="&quot;From File&quot;"/>
