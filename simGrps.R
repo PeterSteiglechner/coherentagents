@@ -3,7 +3,7 @@
 
 ## Encoding: windows-1250
 ## Created:  2022-11-04 FrK
-## Edited:   2022-11-04 FrK
+## Edited:   2022-11-08 FrK
 ## 
 
 
@@ -110,7 +110,8 @@ kh %>%
   geom_point(aes(y = ex_diff), col = "black") +
   annotate('text', x = 9, y = 0.175, label = "This line tells us what's the margin between maximum and minimum 'extremness' for the respective 'k'.\nBut it also might be a hat or a snake who ate an elephant :-)") +
   scale_color_viridis_d() +
-  scale_x_log10() +
+  scale_x_log10(breaks = c(1, 10, 20, 30, 50, 100)) + 
+  guides(colour = guide_legend(override.aes = list(alpha = 1))) +
   theme_light()  +
   theme(legend.position = c(0.85, 0.64))
 
@@ -125,7 +126,8 @@ kh %>%
   geom_point(aes(y = dv_diff), col = "black") +
   annotate('text', x = 10, y = -0.025, label = "Black line tells us what's the margin between maximum and minimum 'diversity' for the respective 'k'.") +
   scale_color_viridis_d() +
-  scale_x_log10() +
+  scale_x_log10(breaks = c(1, 10, 20, 30, 50, 100)) +
+  guides(colour = guide_legend(override.aes = list(alpha = 1))) +
   theme_light()  +
   theme(legend.position = c(0.15, 0.65))
 
@@ -142,6 +144,7 @@ kh %>%
   # lims(x = c(0, 1), y = c(0,1)) +
   annotate("text", x = .6, y = .8, label = "'k' is associated with alpha of points -- the darker point the higher 'k'") +
   labs(title = "'extremness' correlates with 'diversity' in nonlinear fashion -- relationship differs by 'group'") +
+  guides(colour = guide_legend(override.aes = list(alpha = 1))) +
   theme_light() +
   theme(legend.position = c(0.05, 0.8))
 
@@ -232,8 +235,9 @@ df %>%
   scale_color_viridis_d() +
   lims(x = c(0, 1), y = c(0,1)) +
   labs(title = "'extremness' allows 'diversity': 'diversity' is never higher than 'extremness'") +
+  guides(colour = guide_legend(override.aes = list(alpha = 1, size = 10))) +
   theme_light() +
-  theme(legend.position = c(0.05, 0.8))
+  theme(legend.position = c(0.075, 0.7))
 
 ggsave("Experiments/ExtVsDiv.png", units = "cm", width = 20, height = 20)
 
@@ -246,6 +250,7 @@ df %>%
   scale_color_viridis_d() +
   # lims(x = c(0, 1), y = c(0,1)) +
   labs(title = "'diversity' is never higher than 'extremness' [even by manipulated factors]") +
+  guides(colour = guide_legend(override.aes = list(alpha = 1, ))) +
   theme_light() +
   theme(legend.position = c(0.05, 0.8))
 
@@ -260,8 +265,9 @@ df %>% filter(k>1) %>% mutate(k = factor(k) %>% fct_rev()) %>%
   scale_color_viridis_d() +
   # lims(x = c(0, 1), y = c(0,1)) +
   labs(title = "'diversity' is never higher than 'extremness' [even by 'factor' & 'k']") +
+  guides(colour = guide_legend(override.aes = list(alpha = 1, size = 10))) +
   theme_light() +
-  theme(legend.position = c(0.05, 0.84))
+  theme(legend.position = c(0.05, 0.74))
 
 ggsave("Experiments/ExtVsDivByFactorAndK.png", units = "cm", width = 28, height = 21)
 
@@ -274,6 +280,7 @@ df %>% filter(k>1) %>% mutate(k = factor(k) %>% fct_rev()) %>%
   scale_color_viridis_d() +
   # lims(x = c(0, 1), y = c(0,1)) +
   labs(title = "'diversity' is never higher than 'extremness' [even by 'group' & 'k']") +
+  guides(colour = guide_legend(override.aes = list(alpha = 1, size = 10))) +
   theme_light() +
   theme(legend.position = c(0.035, 0.86))
 
@@ -286,6 +293,7 @@ df %>% filter(k>=1) %>% mutate(k = factor(k) %>% fct_rev()) %>%
   geom_boxplot(alpha = 0.3, show.legend = F, col = "grey50") +
   geom_jitter(aes(col = factor), alpha = 0.1) +
   scale_color_viridis_d() +
+  guides(colour = guide_legend(override.aes = list(alpha = 1, size = 5))) +
   theme_light()+
   theme(legend.position = c(0.10, 0.15))
   
@@ -298,6 +306,7 @@ df %>% filter(k>=1) %>% mutate(k = factor(k) %>% fct_rev()) %>%
   geom_boxplot(alpha = 0.3, show.legend = F, col = "grey50") +
   geom_jitter(aes(col = factor), alpha = 0.1) +
   scale_color_viridis_d() +
+  guides(colour = guide_legend(override.aes = list(alpha = 1, size = 5))) +
   theme_light()+
   theme(legend.position = c(0.10, 0.15))
 
@@ -310,18 +319,20 @@ df %>% filter(k>=1) %>% mutate(k = factor(k) %>% fct_rev()) %>%
   geom_boxplot(alpha = 0.3, show.legend = F, col = "grey50") +
   geom_jitter(aes(col = group), alpha = 0.1) +
   scale_color_viridis_d() +
+  guides(colour = guide_legend(override.aes = list(alpha = 1, size = 5))) +
   theme_light()+
   theme(legend.position = c(0.05, 0.25))
 
 ggsave("Experiments/ExtVsKByGroup.png", units = "cm", width = 32, height = 16)
 
 
-df %>% filter(k>=1) %>% mutate(k = factor(k) %>% fct_rev()) %>% 
+df %>% filter(k>=1, group != "ALL") %>% mutate(k = factor(k) %>% fct_rev()) %>% 
   ggplot() +
   aes(x = diversity, y = k) +
   geom_boxplot(alpha = 0.3, show.legend = F, col = "grey50") +
   geom_jitter(aes(col = group), alpha = 0.1) +
   scale_color_viridis_d() +
+  guides(colour = guide_legend(override.aes = list(alpha = 1, size = 5))) +
   theme_light()+
   theme(legend.position = c(0.05, 0.25))
 
