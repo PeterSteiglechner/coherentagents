@@ -3,7 +3,7 @@
 
 ## Encoding: windows-1250
 ## Created:  2022-11-08 FrK
-## Edited:   2022-11-08 FrK
+## Edited:   2022-11-10 FrK
 ## 
 
 ## Notes:
@@ -24,7 +24,7 @@
 # Head --------------------------------------------------------------------
 
 # Clearing environment
-rm(list = ls())
+# rm(list = ls())
 
 # Packages
 library(tidyverse)
@@ -67,6 +67,7 @@ df %>%
   group_by(k, conformity, belief_variability, group) %>% 
   summarise(across(.cols = c(extremness, diversity), ~mean(.x))) %>% 
   arrange(k) %>% 
+  # filter(group == "g4") %>%
   ggplot() +
   aes(x = extremness, y = diversity, group = group,
       col = group, alpha = log(k) / 6) +
@@ -80,14 +81,18 @@ df %>%
 
 ggsave("Experiments/ExtVsDivByConfVsVarVsK.png", units = "cm", height = 84.9, width = 57)
 
+max(df$extremness) - min(df$extremness)
+max(df$diversity) - min(df$diversity)
+
+
 
 df %>% 
   group_by(k, conformity, belief_variability, group) %>% 
   summarise(across(.cols = c(extremness, diversity), ~mean(.x))) %>% 
   arrange(k) %>% 
-  # computing the difference for each K:
   ungroup() %>% group_by(k, conformity, belief_variability) %>% 
   mutate(ex_diff = max(extremness) - min(extremness), dv_diff = max(diversity) - min(diversity)) %>% 
+  # filter(group == "g4") %>%
   ggplot() +
   aes(y = extremness, x = k, group = group,
       col = group, alpha = (diversity + 0.14)) +
@@ -109,6 +114,7 @@ df %>%
   group_by(k, conformity, belief_variability, group) %>% 
   summarise(across(.cols = c(extremness, diversity), ~mean(.x))) %>% 
   arrange(k) %>% 
+  # filter(group == "g4") %>%
   ggplot() +
   aes(x = k, y = diversity, group = group,
       col = group, alpha = extremness) +
@@ -121,10 +127,8 @@ df %>%
   labs(title = "Correlation of 'k' and 'Diversity' for each 'Group', by 'Conformity' and 'Belief variability'") +
   theme_light()
 
-ggsave("Experiments/DivVsKByConfVsVarVsGroup.png", units = "cm", height = 20, width = 40)
+ggsave("Experiments/DivVsKByConfVsVarVsGroup.png", units = "cm", height = 40, width = 40)
 
-max(df$extremness) - min(df$extremness)
-max(df$diversity) - min(df$diversity)
 
 
 
@@ -277,11 +281,10 @@ ggsave("Experiments/subsampleSizeEffect.png", units = "cm", width = 24, height =
 
 ## Individual differences between subsamples
 da = aci(.seeds = 101:110) %>% 
-  pivot_longer(cols = 5:6) %>% 
-  filter(value > 0.000000001) 
+  pivot_longer(cols = 5:6)
 
-da %>% filter(value > 0.0000001) %>% 
-  # summarise(max = min(value)) 
+da %>% 
+  filter(value > 0.0000001) %>% # Filtering out very tiny values -- we do not need to know that some errors are very close to 0
   ggplot()+
   aes(fill = name, x = value, y = group, col = group)+
   geom_boxplot(alpha = 0.3) +
