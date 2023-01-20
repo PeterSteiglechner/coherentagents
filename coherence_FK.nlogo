@@ -402,6 +402,11 @@ to-report coherence-function [matrix vector]
   report coherency
 end
 
+to-report agent-coherence
+  let matrix table:get coherency_matrices [group] of self ; get correlation matrix of agent's group
+  report coherence-function matrix belief_vector
+end
+
 to-report extremness
   report (mean [manhattan-distance belief_vector n-values length belief_vector [0]] of turtles) / num_items
 end
@@ -420,12 +425,20 @@ to-report group-diversity [grp]
   report ifelse-value (max table:keys coherency_matrices >= grp) [mean map [x -> standard-deviation [item x belief_vector] of turtles with [group = grp]] range num_items]["NA"]
 end
 
+to-report group-coherence [grp]
+  report ifelse-value (max table:keys coherency_matrices >= grp) [mean [agent-coherence] of turtles with [group = grp]]["NA"]
+end
+
 to-report g1_ex
   report group-extremness (1)
 end
 
 to-report g1_dv
   report group-diversity (1)
+end
+
+to-report g1_ch
+  report group-coherence (1)
 end
 
 to-report g2_ex
@@ -436,12 +449,20 @@ to-report g2_dv
   report group-diversity (2)
 end
 
+to-report g2_ch
+  report group-coherence (2)
+end
+
 to-report g3_ex
   report group-extremness (3)
 end
 
 to-report g3_dv
   report group-diversity (3)
+end
+
+to-report g3_ch
+  report group-coherence (3)
 end
 
 to-report g4_ex
@@ -452,12 +473,20 @@ to-report g4_dv
   report group-diversity (4)
 end
 
+to-report g4_ch
+  report group-coherence (4)
+end
+
 to-report g5_ex
   report group-extremness (5)
 end
 
 to-report g5_dv
   report group-diversity (5)
+end
+
+to-report g5_ch
+  report group-coherence (5)
 end
 
 to-report g6_ex
@@ -468,12 +497,20 @@ to-report g6_dv
   report group-diversity (6)
 end
 
+to-report g6_ch
+  report group-coherence (6)
+end
+
 to-report g7_ex
   report group-extremness (7)
 end
 
 to-report g7_dv
   report group-diversity (7)
+end
+
+to-report g7_ch
+  report group-coherence (7)
 end
 
 to-report g8_ex
@@ -484,12 +521,20 @@ to-report g8_dv
   report group-diversity (8)
 end
 
+to-report g8_ch
+  report group-coherence (8)
+end
+
 to-report g9_ex
   report group-extremness (9)
 end
 
 to-report g9_dv
   report group-diversity (9)
+end
+
+to-report g9_ch
+  report group-coherence (9)
 end
 
 to-report g10_ex
@@ -500,6 +545,10 @@ to-report g10_dv
   report group-diversity (10)
 end
 
+to-report g10_ch
+  report group-coherence (10)
+end
+
 to-report g11_ex
   report group-extremness (11)
 end
@@ -508,12 +557,20 @@ to-report g11_dv
   report group-diversity (11)
 end
 
+to-report g11_ch
+  report group-coherence (11)
+end
+
 to-report g12_ex
   report group-extremness (12)
 end
 
 to-report g12_dv
   report group-diversity (12)
+end
+
+to-report g12_ch
+  report group-coherence (12)
 end
 
 
@@ -868,7 +925,7 @@ min_degree
 min_degree
 1
 10
-1.0
+10.0
 1
 1
 NIL
@@ -943,7 +1000,7 @@ conformity_tendency
 conformity_tendency
 0
 1
-0.9
+0.2
 0.05
 1
 NIL
@@ -958,7 +1015,7 @@ var_of_new_belief
 var_of_new_belief
 0
 1
-0.8
+0.1
 0.01
 1
 NIL
@@ -1033,7 +1090,7 @@ x_belief
 x_belief
 1
 5
-2.0
+1.0
 1
 1
 NIL
@@ -1048,7 +1105,7 @@ y_belief
 y_belief
 1
 5
-3.0
+2.0
 1
 1
 NIL
@@ -1178,7 +1235,7 @@ INPUTBOX
 978
 135
 k
-3.0
+8.0
 1
 0
 Number
@@ -1221,7 +1278,7 @@ belief_shown
 belief_shown
 1
 5
-2.0
+3.0
 1
 1
 NIL
@@ -1252,7 +1309,7 @@ SWITCH
 573
 visualisations?
 visualisations?
-1
+0
 1
 -1000
 
@@ -1298,7 +1355,7 @@ group_shown
 group_shown
 0
 10
-1.0
+4.0
 1
 1
 NIL
@@ -1667,10 +1724,10 @@ diversity
 11
 
 PLOT
-1225
-589
-1475
-709
+1294
+735
+1537
+884
 Output Measures
 NIL
 NIL
@@ -1684,24 +1741,27 @@ true
 PENS
 "extremness" 1.0 0 -16777216 true "" "plot extremness"
 "diversity" 1.0 0 -7500403 true "" "plot diversity"
+"coherence" 1.0 0 -2674135 true "" "plot mean [agent-coherence] of turtles"
 
 PLOT
-1233
-718
-1433
-868
-Group Output Measures
+1294
+884
+1537
+1034
+Group 1 Output Measures
 NIL
 NIL
 0.0
 10.0
 0.0
-10.0
+1.0
 true
-false
+true
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "plot count turtles"
+"g1_ex" 1.0 0 -16777216 true "" "plot g1_ex"
+"g1_dv" 1.0 0 -7500403 true "" "plot g1_dv"
+"g1_ch" 1.0 0 -2674135 true "" "plot g1_ch"
 
 BUTTON
 1840
@@ -1757,10 +1817,10 @@ PENS
 "default" 1.0 2 -16777216 true "" ""
 
 PLOT
-1512
-582
-1802
-732
+1249
+584
+1539
+734
 extremeness topics
 NIL
 NIL
@@ -1779,10 +1839,10 @@ PENS
 "topic5" 1.0 0 -14835848 true "" "plot mean [abs item 4 belief_vector] of turtles"
 
 PLOT
-1508
-735
-1802
-885
+1539
+584
+1829
+734
 sd topics
 NIL
 NIL
@@ -1807,7 +1867,7 @@ SWITCH
 548
 only_group_shown
 only_group_shown
-1
+0
 1
 -1000
 
@@ -1832,6 +1892,137 @@ ifelse-value (only_group_shown) [group_shown] [\"all\"]
 17
 1
 11
+
+MONITOR
+1140
+706
+1224
+751
+coherence
+mean [agent-coherence] of turtles
+3
+1
+11
+
+PLOT
+1294
+1034
+1537
+1184
+Group 2 Output Measures
+NIL
+NIL
+0.0
+10.0
+0.0
+1.0
+true
+true
+"" ""
+PENS
+"g2_ex" 1.0 0 -16777216 true "" "plot g2_ex"
+"g2_dv" 1.0 0 -7500403 true "" "plot g2_dv"
+"g2_ch" 1.0 0 -2674135 true "" "plot g2_ch"
+
+PLOT
+1294
+1184
+1537
+1334
+Group 3 Output Measures
+NIL
+NIL
+0.0
+10.0
+0.0
+1.0
+true
+true
+"" ""
+PENS
+"g3_ex" 1.0 0 -16777216 true "" "plot g3_ex"
+"g3_dv" 1.0 0 -7500403 true "" "plot g3_dv"
+"g3_ch" 1.0 0 -2674135 true "" "plot g3_ch"
+
+PLOT
+1538
+735
+1781
+885
+Group 4 Output Measures
+NIL
+NIL
+0.0
+10.0
+0.0
+1.0
+true
+true
+"" ""
+PENS
+"g4_ex" 1.0 0 -16777216 true "" "plot g4_ex"
+"g4_dv" 1.0 0 -7500403 true "" "plot g4_dv"
+"g4_ch" 1.0 0 -2674135 true "" "plot g4_ch"
+
+PLOT
+1538
+884
+1781
+1034
+Group 5 Output Measures
+NIL
+NIL
+0.0
+10.0
+0.0
+1.0
+true
+true
+"" ""
+PENS
+"g5_ex" 1.0 0 -16777216 true "" "plot g5_ex"
+"g5_dv" 1.0 0 -7500403 true "" "plot g5_dv"
+"g5_ch" 1.0 0 -2674135 true "" "plot g5_ch"
+
+PLOT
+1538
+1034
+1781
+1184
+Group 6 Output Measures
+NIL
+NIL
+0.0
+10.0
+0.0
+1.0
+true
+true
+"" ""
+PENS
+"g6_ex" 1.0 0 -16777216 true "" "plot g6_ex"
+"g6_dv" 1.0 0 -7500403 true "" "plot g6_dv"
+"g6_ch" 1.0 0 -2674135 true "" "plot g6_ch"
+
+PLOT
+1538
+1184
+1781
+1334
+Group 7 Output Measures
+NIL
+NIL
+0.0
+10.0
+0.0
+1.0
+true
+true
+"" ""
+PENS
+"g7_ex" 1.0 0 -16777216 true "" "plot g7_ex"
+"g7_dv" 1.0 0 -7500403 true "" "plot g7_dv"
+"g7_ch" 1.0 0 -2674135 true "" "plot g7_ch"
 
 @#$#@#$#@
 ## This version (BE)
@@ -2289,7 +2480,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.2.2
+NetLogo 6.3.0
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
