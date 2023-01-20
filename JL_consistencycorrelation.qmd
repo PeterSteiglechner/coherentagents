@@ -1,0 +1,232 @@
+---
+title: "Consistency in Correlations"
+author: Jan Lorenz
+date: 2023-01-20
+format: 
+  html:
+    standalone: true
+    embed-resources: true
+---
+
+## Empirical correlation matrices an definition of consistency 
+
+Read the correlations matrices of Germany CCA.
+
+```{r}
+#| warning: false
+library(tidyverse)
+data <- read_csv("DE/correlationsCCA.csv")
+```
+
+Given a certain correlation matrix $R$ as a cognitive model of an agent and an opinion profile $x = [x_1, x_2, \dots, x_n]$ we define the *consistency* of the opinion as 
+
+$$\frac{1}{2}x^T(R-I)x$$
+
+where $I$ is the identity matrix. 
+
+As an example let us take the correlation matrix of group 1 and some opinion profiles.
+
+```{r}
+consistency <- function(v = rep(0,5), R = diag(rep(1,length(v)))) c(0.5*v%*%(R-diag(rep(1,length(v))))%*%v)
+# Make list of correlation matrices
+R <- 1:7 |> map(function(g) data |> filter(group == g) |> select(freehms:euftf) |> as.matrix())
+
+consistency(c(0,0,0,0,0), R[[1]])
+consistency(c( 1, 1, 1, 1, 1), R[[1]])
+consistency(c(-1,-1,-1,-1,-1), R[[1]])
+consistency(c( 1, 1,-1,-1,-1), R[[1]])
+consistency(c( 1,-1,-1,-1,-1), R[[1]])
+consistency(c( 0.5, 0.5, 0, 1, 1), R[[1]])
+consistency(c(1,0,1,0,1), R[[1]])
+```
+
+
+## Maximal consistency
+
+From observations of our model we see that opinion profiles tend to come to extreme opinions in all five dimensions, for example $[-1, +1, -1, -1, +1]$. 
+There are $2^5=32$ of these opinion profiles. When we add 0 as an option there are $3^5=243$ profiles. 
+We build all these profiles and add compute consistencies for all 7 groups. 
+
+```{r}
+# Make the extreme opinions profiles
+opinions <- 
+  expand_grid(o1=c(-1,0,1), o2=c(-1,0,1), o3=c(-1,0,1), o4=c(-1,0,1), o5=c(-1,0,1)) |> 
+  mutate(id = 1:n()) 
+#append consistencies
+opinions <- opinions |> pivot_longer(o1:o5) |> group_by(id) |> 
+  summarize(R1 = consistency(value, R[[1]]),
+            R2 = consistency(value, R[[2]]),
+            R3 = consistency(value, R[[3]]),
+            R4 = consistency(value, R[[4]]),
+            R5 = consistency(value, R[[5]]),
+            R6 = consistency(value, R[[6]]),
+            R7 = consistency(value, R[[7]])
+  ) |> left_join(opinions, by = "id") 
+```
+
+
+The following table show the maximal consistencies for the 7 groups and the corresponding opinion profiles. Note, that the profile with signs switched has the same consistency. The table only shows the opinion profiles with opinion in dimension 1 being +1. 
+Further on, we also compute the mean absolute correlation and the first eigenvalue of the correlation matrix as potential measures related to maximal consistency. 
+
+```{r}
+#| label: max_consistency
+# function to compute the mean correlation coefficients absolute values, ignoring the diagonals
+meanabscorr <- function(R) mean(abs(R[upper.tri(R)]))
+# function to get first eigenvalue
+get_eigenvalue1 <- function(R) eigen(R)$value[1]
+# filter rows with maximal consistencies and add meanabscorr for groups
+max_opinions <- bind_rows(
+  opinions |> filter(R1 == max(R1)) |> slice(2)|> select(max_consistency = R1, o1:o5) |> mutate(group = 1), 
+  opinions |> filter(R2 == max(R2)) |> slice(2)|> select(max_consistency = R2, o1:o5) |> mutate(group = 2), 
+  opinions |> filter(R3 == max(R3)) |> slice(2)|> select(max_consistency = R3, o1:o5) |> mutate(group = 3), 
+  opinions |> filter(R4 == max(R4)) |> slice(2)|> select(max_consistency = R4, o1:o5) |> mutate(group = 4), 
+  opinions |> filter(R5 == max(R5)) |> slice(2)|> select(max_consistency = R5, o1:o5) |> mutate(group = 5), 
+  opinions |> filter(R6 == max(R6)) |> slice(2)|> select(max_consistency = R6, o1:o5) |> mutate(group = 6), 
+  opinions |> filter(R7 == max(R7)) |> slice(2)|> select(max_consistency = R7, o1:o5) |> mutate(group = 7)
+) 
+max_opinions |> mutate(meanabscorr = R |> map_vec(meanabscorr), 
+                       eigenvalue = R |> map_vec(get_eigenvalue1)) |> 
+  select(group, meanabscorr, eigenvalue, max_consistency, everything()) |> 
+  knitr::kable(digits = 2)
+```
+
+The table shows that all maximal consistencies have no zeros in it, which confirms out intuition that opinions tend to be extreme. 
+
+
+## Why are the maximal consistencies so different?
+
+Looking at the mean absolute correlation compared to the maximal consistency we see that they match strongly. Similarly, the first eigenvalue also matches maximal consistency. 
+
+However, groups 5 and 7 have the same mean absolute correlation but group 7 has a lower maximal consistency. Maybe this groups shows some inconsistencies which are somehow build in the correlation matrix. Let us take a look. 
+
+### Group 7
+
+This is the correlation matrix. 
+
+```{r}
+R[[7]] |> knitr::kable(digits = 2)
+```
+
+Their most consistent opinion is $[+1,+1,+1,+1,+1]$. That means 
+
+- free homosexuals, 
+- in favor of governments reducing income, 
+- right-wing, 
+- allow immigrants
+- in favor of European integration.  
+
+So, any negative correlation coefficient is an inconsistency with this opinion profile. 
+
+If we look at line 1 (freehms) of the correlation matrix we see that it should be negatively correlated with lrscale but it is not. 
+In line 2 (gincdif) we also see another inconsistency with lrscale. 
+(We omit to mention the symmetry implied inconsistencies in line 3.)
+
+The two inconsistent correlations have absolute values of 0.18 and 0.22. 
+
+Let us compare with group 5. 
+
+## Group 5
+
+This is the correlation matrix. 
+
+```{r}
+R[[5]] |> knitr::kable(digits = 2)
+```
+
+Their most consistent opinion is $[+1,+1,+1,-1,-1]$. That means 
+
+- free homosexuals, 
+- in favor of governments reducing income, 
+- right-wing, 
+- allow no immigrants
+- against of European integration.  
+
+If we looking at line 1 (freehms) the opinion profile is consistent because the signs fit. 
+The same for line 2. 
+In line 3 (lrscale) we see an inconsistency with impcntr which should be negative comparing the opinions of both. 
+So, there is only one inconsistency with a correlation coefficient of 0.1, much less than group 7 which explains why group 7 has a lower maximal consistency although the mean absolute correlation is the same. 
+
+### Group 4
+
+In group 4 the low level of consistency is mostly driven be the low mean absolute correlation, but we also find an inconsistency. 
+
+```{r}
+R[[4]] |> knitr::kable(digits = 2)
+```
+
+Their most consistent opinion is $[+1,-1,+1,+1,+1]$. That means 
+
+- free homosexuals, 
+- against government reducing income, 
+- right-wing, 
+- allow immigrants
+- in favor of European integration.  
+
+If we looking at line 1 (freehms) of the correlation matrix we see that the signs are consistent (although it does not matter much for euftf).
+In line 2 (gincdif) we see the first inconsistency, as gincdif is negative and the correlation with impcntr is positive als impcntr should be negative but it is positive. In line 3 (lrscale) we see a negligible inconsistency with impcntry: The correlation is slightly negative but opinions are both +1. 
+
+
+## Is the first eigenvector the direction of most consistency?
+
+Probably yes.
+
+We extract the first eigenvector of the correlation matrices of groups and use it as an opinion vector and compute its consistency. 
+
+We want to compare these to the maximal consistency opinion vectors found above. However, to compare them in the framework of eigenvectors we have to make them the same Euclidean length as the eigenvectors. Eigenvectors are typically reported normalized such that their Euclidean length is one. So we scale down our maximal consistency opinion vectors (which have Euclidean length $\sqrt{5} = 2.236$) to have Euclidean length one.
+
+```{r}
+#| label: eigen-analysis
+
+# Selection of the first eigenvector of correlation matrices
+ev_opinions <- 1:7 |> 
+  map(function(i) eigen(R[[i]])$vector[,1] |> set_names(paste0("o_ev",1:5))) |> 
+  reduce(bind_rows) |> mutate(group = 1:7)
+ev_opinions |> pivot_longer(o_ev1:o_ev5) |> group_by(group) |> 
+  summarize(consistency = consistency(value,R[[max(group)]])
+  ) |> left_join(ev_opinions, by = "group") |> 
+  knitr::kable(digits = 2)
+
+max_opinions |> pivot_longer(o1:o5) |> group_by(group) |> 
+  mutate(value = value/norm(value, type = "2")) |> 
+  summarize(consistency_norm1 = consistency(value,R[[max(group)]])
+  ) |> left_join(max_opinions, by = "group") |>   
+  knitr::kable(digits = 2)
+```
+
+This is not a proof of optimality yet, but it seems highly plausible. 
+
+## Conclusion for the model 
+
+To reach optimal consistency, agents in a group should line up on the line the first eigenvector spans in the 5-dimensional opinion space. Then they should become as extreme as possible. Our model allows values in each dimension to be maximally +1 or minimally -1. On their travel to extremes, the agents reach the border of the opinion space once one opinion turns 1. In our model agents can increase consistency not only by getting on the line of the eigenvector but also by having extreme opinions and it turns out that they can increase their consistency by deviating from the eigenvector line to just achieve higher absolute values in their opinions. The highest sum of opinion vectors are obviously in the corner of the opinion space. 
+
+
+## Appendix: Double check, are there better opinion profiles with higher consistency?
+
+Below we do a larger grid search testing all all opinions composed of values $\{-1, -0.75, -0.5, -0.25, 0, 0.25, 0.5, 0.75, 1\}$. We again find the same optimal values in corners or the opinion space. 
+
+```{r}
+#| cache: true
+opinions <- 
+  expand_grid(o1=seq(-1,1,0.25), o2=seq(-1,1,0.25), o3=seq(-1,1,0.25), o4=seq(-1,1,0.25), o5=seq(-1,1,0.25)) |> 
+  mutate(id = 1:n()) 
+#append consistencies 
+opinions <- opinions |> pivot_longer(o1:o5) |> group_by(id) |> 
+  summarize(R1 = consistency(value, R[[1]]),
+            R2 = consistency(value, R[[2]]),
+            R3 = consistency(value, R[[3]]),
+            R4 = consistency(value, R[[4]]),
+            R5 = consistency(value, R[[5]]),
+            R6 = consistency(value, R[[6]]),
+            R7 = consistency(value, R[[7]])
+  ) |> left_join(opinions, by = "id")
+
+bind_rows(
+  opinions |> filter(R1 == max(R1)) |> slice(2)|> select(max_consistency = R1, o1:o5) |> mutate(group = 1), 
+  opinions |> filter(R2 == max(R2)) |> slice(2)|> select(max_consistency = R2, o1:o5) |> mutate(group = 2), 
+  opinions |> filter(R3 == max(R3)) |> slice(2)|> select(max_consistency = R3, o1:o5) |> mutate(group = 3), 
+  opinions |> filter(R4 == max(R4)) |> slice(2)|> select(max_consistency = R4, o1:o5) |> mutate(group = 4), 
+  opinions |> filter(R5 == max(R5)) |> slice(2)|> select(max_consistency = R5, o1:o5) |> mutate(group = 5), 
+  opinions |> filter(R6 == max(R6)) |> slice(2)|> select(max_consistency = R6, o1:o5) |> mutate(group = 6), 
+  opinions |> filter(R7 == max(R7)) |> slice(2)|> select(max_consistency = R7, o1:o5) |> mutate(group = 7)
+) |> select(group, everything()) |> knitr::kable(digits = 2)
+```
