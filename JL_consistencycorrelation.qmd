@@ -195,6 +195,14 @@ max_opinions |> pivot_longer(o1:o5) |> group_by(group) |>
 
 This is not a proof of optimality yet, but it seems highly plausible. 
 
+```{r}
+ev_opinions |> set_names(attitudenames, "group") |> 
+  pivot_longer(freehms:euftf) |> 
+  ggplot(aes(y = name, x = value)) + geom_col() +
+  facet_wrap(~group, ncol=7)
+```
+
+
 ## Conclusion for the model 
 
 To reach optimal consistency, agents in a group should line up on the line the first eigenvector spans in the 5-dimensional opinion space. Then they should become as extreme as possible. Our model allows values in each dimension to be maximally +1 or minimally -1. On their travel to extremes, the agents reach the border of the opinion space once one opinion turns 1. In our model agents can increase consistency not only by getting on the line of the eigenvector but also by having extreme opinions and it turns out that they can increase their consistency by deviating from the eigenvector line to just achieve higher absolute values in their opinions. The highest sum of opinion vectors are obviously in the corner of the opinion space. 

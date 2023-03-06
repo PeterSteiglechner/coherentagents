@@ -1,0 +1,157 @@
+---
+title: "Correlational Class Analysis"
+author: Jan Lorenz
+date: 2023-03-06
+format: 
+  html: 
+    standalone: true
+    embed-resources: true
+---
+
+## Data from the ESS
+
+We extract and tranform the data from the ESS as in the script `data_processing_clean_MB.R`.
+
+
+```{r}
+library(tidyverse)
+library(corclass)
+library(igraph)
+```
+
+```{r}
+#| cache: true
+raw <- read_csv('ESS9e03_1.csv') # Use this to select other context variables later
+dffull <-  raw %>% 
+  # Filtering the cases -- cases with missing values on believes variables deleted:
+  filter(freehms <= 5, gincdif <= 5, impcntr <= 4, 
+         lrscale <= 10, euftf <= 10)%>%
+  mutate(
+    # Scaling data to values within [-1, 1]. 
+    # v' = -1 + 2 * (v-m)/(M-m), where m is the lowest, M the highest possible answer
+    across(c(freehms, gincdif), ~ -1 + 2 * (.x - 1)/(5-1)), 
+    across(c(lrscale, euftf), ~ -1 + 2 * (.x - 0)/(10-0)), 
+    impcntr = -1 + 2* (impcntr - 1)/(4-1),
+    # Flipping some scales: some questions are asked in a "negative" sense: 
+    # e.g. -1 --> "more immigrants" and 1 --> "less immigrants"
+    across(c(freehms, gincdif, impcntr), ~ .x * -1)
+  )
+attitudenames <- c("freehms", "gincdif", "lrscale", "impcntr", "euftf")
+cntrynames <- dffull$cntry |> unique()
+DE <- dffull |> select(idno,cntry,all_of(attitudenames)) |> filter(cntry == "DE")
+```
+
+Now we have 5 core variables ranging from -1 to +1. 
+
+```{r}
+DE |> select(idno,cntry,all_of(attitudenames)) |> head(7) |> knitr::kable()
+```
+
+
+## Correlational class analysis 
+
+Now we look in more detail how correlation class analysis as in `corclass` works based on
+
+Boutyline, A. (2017). Improving the measurement of shared cultural schemas with correlational class analysis: Theory and method. Sociological Science, 4(15), 353-393. <http://doi.org/10.15195/v4.a15>.
+
+```{r}
+#| cache: true
+cmDE <- DE |> select(all_of(attitudenames)) |> cca()
+```
+
+We will look at Germany as example which has `r nrow(DE)` individuals. The algorithm finds 7 classes. 
+
+
+The algorithm works as follows:
+
+1. A `r nrow(DE)`-by-`r nrow(DE)` similarity matrix for all individuals $i,j$ is constructed. Each entry is the absolute value of the (Pearson) correlation coefficients of the opinion profiles for individual $i$ and $j$. Each profile is a vector of five values across the five variables `r attitudenames`.
+2. Similarities in the similarity matrix maybe set to zero. The default is to compute an estimate for the absolute value of the correlation which is needed such that the correlation is meaning full in the sense of statistical significance with p-value 0.01. That means a threshold values is computed and all correlations which absolute value below that threshold are set to zero. The rationale is that these correlations are not sufficiently statistically significant. 
+3. Then an algorithm of modularity-maximization is applied to the similarity matrix following   
+Newman, M. E. J. (2006). Modularity and community structure in networks. Proceedings of the National Academy of Sciences, 103(23), 8577–8582. <https://doi.org/10.1073/pnas.0601602103>  
+which returns a partition of the individuals to a certain number of groups (the modules). The method is called `leading eigenvector` method and is documented in `igraph::cluster_leading_eigen`. 
+
+The similarity matrix for the first 7 individuals looks like 
+
+```{r}
+abs(cor(t(DE[,attitudenames])))[1:7,1:7]
+```
+
+```{r}
+n <- 17 # 17 musical tastes in the survey
+pval <- 0.01
+rcrit17 <- abs(qt(pval/2, n)) / sqrt(n - 2 + abs(qt(pval/2, n))^2)
+n <- 5 
+rcrit5 <- abs(qt(pval/2, n)) / sqrt(n - 2 + abs(qt(pval/2, n))^2)
+```
+
+The threshold for the significance at the significance level of 0.01 is computed based on standard estimates which only takes the number of variables and the significance level as input. In the original example this threshold is 17 which gives a threshold of `r rcrit17`. With the 5 variables we use this trheshold is much higher: `r rcrit5`.
+
+## Further insight from Boutyline (2017)
+
+- The algorithms only uses absolute values of correlation between individuals (rows) not variables. However, the paper then analyzes that afterwards the absolute correlations of variables (columns) within groups are higher than between groups. This seems to be an analysis of the empirical and simulated data and not a mathematical argument. Maybe this is an open question. 
+- The optimization is on absolute correlation. That means individuals with exactly opposite opinion vectors are in the same group. That is they share the same cultural schema. **As consequence, that naming of groups should be by definition of a political axis with two poles and not on the substantive opinions in that group. That can coincide with naming based on the direction of the first eigenvector in the opinion space.** The seven groups we get are probably hard to describe easily because we have only five variables. (See below.)
+- The appropriateness of modularity maximization is a topic in itself and is discussed a bit in the paper. That may be looked at in more detail. 
+- The method is typically used with more variables than just 5. Using only five variables implies that the only correlations above 0.91 count as valid similarity between individuals. Using a less strict p-value (like 0.05 instead of 0.01 or no threshold) would lead to a lower number of groups than the seven groups. **An idea could be to use groups computed without setting similarities to zero.**
+
+
+## What should we do?
+
+- We should have fitting group descriptions on the first eigenvector direction.
+- Maybe we should go for the no-significance solution. In our case this delivers 2 to 4 groups instead of around 7 which will be much easier to interpret. 
+
+Examples: 
+
+### The 7 groups solution for DE (with sign. p=0.01)
+
+```{r}
+R <- cmDE$modules |> map(\(x) x$cormat)
+ev_opinions <- 1:length(R) |> 
+  map(function(i) eigen(R[[i]])$vector[,1] |> set_names(attitudenames)) |> 
+  reduce(bind_rows) |> mutate(group = 1:length(R))
+ev_opinions |> set_names(attitudenames, "group") |>
+  pivot_longer(freehms:euftf) |>
+  ggplot(aes(y = name, x = value)) + geom_col() +
+  facet_wrap(~group, ncol=7)
+```
+
+- Group 1 represents the cultural schema that being left goes together with having positive attitudes to immigrants, homosexuals, and the EU, while being right with negative attitude about all of these. However, being neutral on the governments role to redistribution. 
+- Group 2 represents the cultural schema that being right goes together with negative attitudes on immigrants, redistribution, and homosexuals, but being neutral on EU. The opposite for being left. 
+- With seven groups it maybe hard to distinguish all groups properly. For example group 2 and 7 are very similar. 
+
+
+### The no significance solution for DE
+
+```{r}
+plot_evs <- function(cn) {
+  R <- read_csv(paste0("ns_",cn,"/correlationsCCA.csv"), show_col_types = F) |> 
+    select(all_of(attitudenames), group) |> group_by(group) |> 
+    group_split(.keep = FALSE)
+  ev_opinions <- 1:length(R) |> 
+    map(function(i) eigen(R[[i]])$vector[,1] |> set_names(attitudenames)) |> 
+    reduce(bind_rows) |> mutate(group = 1:length(R))
+  ev_opinions |> set_names(attitudenames, "group") |>
+    pivot_longer(freehms:euftf) |>
+    ggplot(aes(y = name, x = value)) + geom_col() +
+    facet_wrap(~group, ncol=7)
+}  
+plot_evs("DE")
+```
+
+- Cultural Schema of Group 1: Right goes together with negative attitudes on immigrants, redistribution, homosexuals, and EU. Left would imply positive attitudes on all of these. 
+- Cultural Schema of Group 2: Right means mainly being against redistribution and being in favor of rights of homosexuals, while left means to be less for freedom for homosexuals but for redistribution.
+- Cultural Schema of Group 3: Freedom for homosexuals also means being in favor of redistribution and against EU, that also means being left. 
+
+
+### Other countries
+
+```{r}
+plot_evs("CH")
+plot_evs("CZ")
+plot_evs("FR")
+plot_evs("PL")
+plot_evs("SE")
+```
+
+
+
+
