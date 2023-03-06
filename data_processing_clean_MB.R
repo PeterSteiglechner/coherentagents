@@ -74,18 +74,21 @@ computeCorrelations <- function(df, attitudenames = c("freehms", "gincdif", "lrs
   df_matrix
 }
 
-writeForABM <- function(df, attitudenames, country_name, groupingMethod, method = "cca") {
+writeForABM <- function(df, attitudenames, country_name, groupingMethod, method = "cca", homophily = FALSE) {
   items <- appendGroups(dffull, attitudenames = attitudenames, 
                         country_name = country_name, method = method)
   items <- checkGroups(items)
+  if (homophily) items = arrange(items, group, idno)
   correlationsCCA <- computeCorrelationsPerGroup(items)
   correlations <- computeCorrelations(items)
   if (!dir.exists(country_name)) {
     dir.create(country_name)
   } 
-  write_csv((items %>% select(-cluster_exclusion)), paste0(country_name,"/itemsCCA.csv"))
+  write_csv((items %>% select(-cluster_exclusion)), 
+            paste0(country_name,"/itemsCCA", if_else(homophily, "_hom", ""), ".csv"))
   write_csv(correlationsCCA, paste0(country_name,"/correlationsCCA.csv"))
-  write_csv((items %>% select(-cluster_exclusion) %>% mutate(group = 1)), paste0(country_name,"/items.csv"))
+  write_csv((items %>% select(-cluster_exclusion) %>% mutate(group = 1)), 
+            paste0(country_name,"/items", if_else(homophily, "_hom", ""), ".csv"))
   write_csv(correlations, paste0(country_name,"/correlations.csv"))
 }
 
@@ -94,6 +97,9 @@ attitudenames = c("freehms", "gincdif", "lrscale", "impcntr", "euftf")
 writeForABM(dffull, attitudenames, country_name = "DE", method = "cca") # Takes time because of RCA!
 writeForABM(dffull, attitudenames, country_name = "PL", method = "cca") # Takes time because of RCA!
 writeForABM(dffull, attitudenames, country_name = "CZ", method = "cca") # Takes time because of RCA!
+writeForABM(dffull, attitudenames, country_name = "DE", method = "cca", homophily = TRUE) # Takes time because of RCA!
+writeForABM(dffull, attitudenames, country_name = "PL", method = "cca", homophily = TRUE) # Takes time because of RCA!
+writeForABM(dffull, attitudenames, country_name = "CZ", method = "cca", homophily = TRUE) # Takes time because of RCA!
 
 
 
