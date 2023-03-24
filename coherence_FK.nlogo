@@ -132,7 +132,7 @@ to initialize-comm-network
     ]
     network_type = "Kleinberg" [
       resize-world 0 (round(sqrt(num_agents)) - 1) 0 (round(sqrt(num_agents)) - 1)
-      nw:generate-small-world turtles links round(sqrt(num_agents)) round(sqrt(num_agents)) 2.0 toroidial_world?
+      nw:generate-small-world turtles links round(sqrt(num_agents)) round(sqrt(num_agents)) 12.0 toroidial_world?
       (foreach (sort turtles) (sort patches) [ [t p] -> ask t [ move-to p ] ])
       ask links [set hidden? not show-new-links?]
       ask turtles [set size 0.5]
@@ -196,17 +196,16 @@ to initialize-agents
     file-close
     file-open agent_data
     let line file-read-line
-    ;show line
-    (foreach (sort turtles) [ [t] ->
+    let readers sort turtles
+    if not homophily? [set readers (shuffle readers)]
+    (foreach (readers) [ [t] ->
       ask t [
         set line csv:from-row file-read-line
-        ;; show line
         let bv but-first (but-last (line))
         set belief_vector bv
         set idno first line
         set group last line
         if not is-number? group [error (word "Turtle " who " has a group which is not a number")]
-        ;show (word "Length: " length(bv) ", Group: " group ", ID: " idno ", Believes: " bv ", Min: " min(bv) ", Max: " max(bv))
       ]
     ])
     file-close
@@ -238,7 +237,7 @@ to initialize-agents
   ;; other stuff
   ask turtles [
     set shape "circle"
-    set color (group * 10) + 5
+    set color (group * 20) + 5
     ifelse network_type = "Kleinberg" [set size 0.5] [set size 1]
   ]
 end
@@ -884,7 +883,7 @@ rewiring
 rewiring
 0
 1
-0.1
+0.079
 0.001
 1
 NIL
@@ -975,7 +974,7 @@ INPUTBOX
 973
 70
 agent_data
-DE/itemsCCA.csv
+ns_DE/itemsCCA.csv
 1
 0
 String
@@ -986,7 +985,7 @@ INPUTBOX
 1126
 70
 corol_mat_file
-DE/correlationsCCA.csv
+ns_DE/correlationsCCA.csv
 1
 0
 String
@@ -1090,7 +1089,7 @@ x_belief
 x_belief
 1
 5
-1.0
+2.0
 1
 1
 NIL
@@ -1105,7 +1104,7 @@ y_belief
 y_belief
 1
 5
-2.0
+5.0
 1
 1
 NIL
@@ -1278,7 +1277,7 @@ belief_shown
 belief_shown
 1
 5
-3.0
+5.0
 1
 1
 NIL
@@ -1355,7 +1354,7 @@ group_shown
 group_shown
 0
 10
-4.0
+3.0
 1
 1
 NIL
@@ -1448,9 +1447,9 @@ Number
 
 TEXTBOX
 10
-385
+430
 104
-403
+448
 Link initialisation
 11
 0.0
@@ -1728,7 +1727,7 @@ PLOT
 735
 1537
 884
-Output Measures
+All agents: Output Measures
 NIL
 NIL
 0.0
@@ -2023,6 +2022,17 @@ PENS
 "g7_ex" 1.0 0 -16777216 true "" "plot g7_ex"
 "g7_dv" 1.0 0 -7500403 true "" "plot g7_dv"
 "g7_ch" 1.0 0 -2674135 true "" "plot g7_ch"
+
+SWITCH
+3
+377
+146
+410
+homophily?
+homophily?
+0
+1
+-1000
 
 @#$#@#$#@
 ## This version (BE)

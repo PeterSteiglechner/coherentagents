@@ -21,13 +21,17 @@ attitudenames <- c("freehms", "gincdif", "lrscale", "impcntr", "euftf")
 cntrynames <- dffull$cntry |> unique()
 
 write_ABM_data <- function(country, attitudenames) {
-  dir.create(paste0("ns_",country))
-  countrydf <- dffull |> select(idno,cntry,all_of(attitudenames)) |> filter(cntry == country)
+  if (!dir.exists(paste0("ns_",country))) {
+    dir.create(paste0("ns_",country))
+  } 
+  countrydf <- dffull |> select(idno, cntry, all_of(attitudenames)) |> filter(cntry == country)
   cm <- countrydf |> select(all_of(attitudenames)) |> cca(filter.significance = FALSE)
   1:length(cm$modules) |> 
-    map(function(i) cm$modules[[i]]$dtf |> as_tibble() |> 
-          mutate(group = i)) |> 
-    reduce(bind_rows) |> 
+    map(function(i) cm$modules[[i]]$dtf |> as_tibble() |>
+          mutate(group = i)) |>
+    reduce(bind_rows) |>
+    mutate(idno = 1:nrow(countrydf)) |>  # Note: Our the most advanced ABM supposes that the first column of data is 'idno' which is not read in agents, so we "create" here 'idno' containing just unuseful number -1. 
+    relocate(idno, .before = freehms) |>
     write_csv(paste0("ns_",country,"/itemsCCA.csv"))
   1:length(cm$modules) |> 
     map(function(i) cm$modules[[i]]$cormat |> as_tibble() |> 
@@ -35,4 +39,7 @@ write_ABM_data <- function(country, attitudenames) {
     reduce(bind_rows) |> 
     write_csv(paste0("ns_",country,"/correlationsCCA.csv"))
 }  
-cntrynames |> map(\(x) write_ABM_data(x,attitudenames))
+
+write_ABM_data("DE",attitudenames)
+#cntrynames |> map(\(x) write_ABM_data(x,attitudenames))
+
