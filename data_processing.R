@@ -30,7 +30,10 @@ write_ABM_data <- function(country, attitudenames) {
     map(function(i) cm$modules[[i]]$dtf |> as_tibble() |>
           mutate(group = i)) |>
     reduce(bind_rows) |>
-    mutate(idno = 1:nrow(countrydf)) |>  # Note: Our the most advanced ABM supposes that the first column of data is 'idno' which is not read in agents, so we "create" here 'idno' containing just unuseful number -1. 
+    mutate(idno = sample(1:nrow(countrydf), nrow(countrydf), replace = F)) |>  
+    arrange(idno) |> 
+             # Note: Our the most advanced ABM supposes that the first column of data is 'idno' which is not read in agents, so we "create" here 'idno' containing just unuseful number -1. 
+             # Note JL: Added random resample of idnos to avoid ordered network
     relocate(idno, .before = freehms) |>
     write_csv(paste0("ns_",country,"/itemsCCA.csv"))
   1:length(cm$modules) |> 
@@ -41,5 +44,27 @@ write_ABM_data <- function(country, attitudenames) {
 }  
 
 write_ABM_data("DE",attitudenames)
-#cntrynames |> map(\(x) write_ABM_data(x,attitudenames))
+## The following writes out groups for all countries
+# cntrynames |> map(\(x) write_ABM_data(x,attitudenames))
+
+
+## Eigenvector Analysis
+
+R <- read_csv("ns_DE/correlationsCCA.csv")
+X <- read_csv("ns_DE/itemsCCA.csv")
+
+coherence <- function(v = rep(0,5), R = diag(rep(1,length(v)))) c(0.5*v%*%(as.matrix(R)-diag(rep(1,length(v))))%*%v)
+Rs <- R |> select(-item) |> nest(.by = "group") |> 
+  mutate(vectors = data |> map(function(x) eigen(x)$vectors),
+         values = data |> map(function(x) eigen(x)$values),
+         val1 = values |> map_dbl(function(x) x[1]),
+         ev1 = vectors |> map(function(x) x[,1] * sign(x[3,1])),
+         ev1_face = ev1 |> map(function(v) v/max(abs(v))),
+         ev1_corner = ev1 |> map(function(v) sign(v)),
+         val2 = values |> map_dbl(function(x) x[2]),
+         ev2 = vectors |> map(function(x) x[,2] * sign(x[3,2])),
+         coh_face = map2_dbl(ev1_face, data, coherence),
+         coh_corner = map2_dbl(ev1_corner, data, coherence),
+         percent_variance = val1/5)
+Rs
 
