@@ -189,18 +189,15 @@ to initialize-agents
     file-close
     file-open agent_data
     let line file-read-line
-    ;show line
-    (foreach (sort turtles) [ [t] ->
+     (foreach (sort turtles) [ [t] ->
       ask t [
         set line csv:from-row file-read-line
-        ;; show line
         let bv but-first (but-last (line))
         set belief_vector bv
         set idno first line
         set group last line
         if not is-number? group [error (word "Turtle " who " has a group which is not a number")]
-        ;show (word "Length: " length(bv) ", Group: " group ", ID: " idno ", Believes: " bv ", Min: " min(bv) ", Max: " max(bv))
-      ]
+       ]
     ])
     file-close
 
@@ -311,14 +308,12 @@ to be-socially-influenced
   let ends shuffle sort both-ends  ;; SORT transforms agent set to list, SHUFFLE randomizes the order
   let sender first ends  ;; Since we randomized order in the pair of agents we might take the first as SENDER...
   let receiver last ends  ;; ...and the last as RECEIVER
-  ; print (word "Is later sometimes the first? " (([who] of sender) > ([who] of receiver)) ", because " sender " sends belief to " receiver) ;; just for code-checking...
 
   ;; SENDER randomly picks the belief dimension and get her belief value:
   let message 0  ;; we need to initialize MESSAGE on the level of the link
   let dimension random num_items  ;; randomly set the dimension
   ask sender [
     set message item dimension belief_vector
-    ;print (word dimension "; " message "; " belief_vector)  ;; just for code-checking...
   ]
   ask receiver [
     ;; Main function, we are changing belief here as well as returning coherency of suggested belief
@@ -596,7 +591,6 @@ to visualize
   ask ifelse-value (only_group_shown) [turtles with [group = group_shown]] [turtles] [
     set-plot-pen-color (group * 20) + 5
     (foreach (n-values length belief_vector [ i -> (i + 0.5) / length belief_vector ]) (belief_vector) [ [x y] -> plotxy x + some_fuzz y])
-    ; plotxy (some_fuzz + group / max [group] of turtles) (some_fuzz + item (y_belief  - 1) belief_vector)
   ]
 
   set-current-plot "Attitude Dynamics"
@@ -665,8 +659,8 @@ end
 GRAPHICS-WINDOW
 148
 10
-654
-517
+656
+519
 -1
 -1
 5.2631578947368425
@@ -1108,7 +1102,7 @@ INPUTBOX
 978
 135
 k
-4.0
+10.0
 1
 0
 Number
@@ -1126,7 +1120,7 @@ INPUTBOX
 79
 141
 rand-seed
-10.0
+1.0
 1
 0
 Number
@@ -1756,14 +1750,7 @@ All agents update their believes and the next round starts.
 
 ### Link Initialisation
 
-*Initial_link_goodness* can take one of the following values, to set the link variable, *link_health*:
-
-* "Random Uniform" - initialises links with a uniform random float from [-1, 1]
-* "Random Normal" - initialises links with a rundom normal N(0, 0.333333) constrained to be in [-1, 1]
-* "High" - initialises links with the value 1
-* "Neutral" - initialises links with the value 0
-* "Low" - initialises links with the value -1
-
+The link variable *link_health* is initialized  with the value 1
 
 ### Agent Initialisation
 
@@ -1777,7 +1764,6 @@ All agents update their believes and the next round starts.
 
 ### Belief Process Parameters
 
-* *Coherence_Meth*: the method used to determin coherency of beliefs
 * *k*: the steepness of the logistic curve used to map [-1, 1] to probabilities. Lower numbers means more randomness
 * *conformity_tendency*: how much an agents shifts its belief towards one that is successfully suggested by another agent
 * *var_of_new_belief*: how big a variation of a belief is considered when an agent looks at the consistency of its beliefs
@@ -1819,11 +1805,7 @@ Bottom right is a 2D visualisation of the aattitude spade showing two item dimen
 * *y_belief*: selects the dimensioni for the y-axis
 * *fuzz*: is the amount of noise in the plotting (useful if all dots are on exactly the same place)
 
-There are three graphs below the world view. From left to right: (1) the average number links / agent over time (2) a historgram of the node arities (3) a histogram of link health values.
-
-There are two monitors, to top right of world view: (a) the (smoothed) measure of seconds per simulation tick (b) the links per number of agents.
-
-The text window shows summaries of the data reaad in.
+There are three graphs below the world view. From left to right: (1) the average number links / agent over time (2) a historgram of the node arities (3) a histogram of link health values. The text window right to them shows summaries of the data read in.
 @#$#@#$#@
 default
 true
