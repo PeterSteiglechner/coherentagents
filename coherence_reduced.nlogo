@@ -1,13 +1,6 @@
-;;;;; Model using coherence agents -- written from scratch
+;;;;; Model using coherence agents -- version accompanying the paper
 
-;; Updated: 2022-08-10 FranCesko
-
-;; Brucified version based on Marlene's version ("newnew" or ver2, 15/Jul/22)
-;; Bruce changed the process of new link creation (01/08/22)
-;; Peter changed coherence-function using matrix algebra (01/08/22)
-;; FranCesko added STORE! procedure and respective button, switches and inputs (10/08/22)
-;; Peter corrected errors in link_health/link-dropping (12/08/22)
-;; FranCesko corrected 'git error'
+;; Updated: 2023-10-13 FranCesko
 
 
 ;; HEADER STUFF
@@ -668,115 +661,12 @@ to-report prob [vl]
   ;; makes code slightly cleaner :-)
   report (random-float 1) < vl
 end
-
-to STORE!
-  ;; If nothing is selected for storing, then stop 'STORE!'.
-  if (not store_agents?) and (not store_network?) and (not store_metadata?) [
-    user-message "Nothing selected for storing,\n'store_agents?' is off\n'store_network?' is off\n'store_metadata?' is off,\n'STORE!' is stopped."
-    stop
-  ]
-
-  ;; We have to prepare random_stamp:
-  let random_stamp ifelse-value (use_random_stamp?) [abs(new-seed)][own_stamp]
-
-  ;; Setting folder to store all files:
-  if storing_folder = "" [
-    user-message "Storing folder is not specified, please do it now."
-    set storing_folder user-directory
-  ]
-  set-current-directory storing_folder
-
-  ;; Storing agents:
-  if store_agents? [
-    ;; Construct filename:
-    if store_agents_filename = "" [set store_agents_filename user-input "How do you name file for storing agents' data?\n(Please, without file extension!)"]
-    let name (word store_agents_filename "_" random_stamp ".csv")
-
-    ;; Creating file:
-    file-open name
-
-    ;; Writing agents data into the file:
-    ;; Variables labels:
-    file-type "idno, "
-    foreach item_labels [l -> file-type l file-type ", "]
-    file-print "group"
-    ;; Turtle data:
-    ask turtles [
-      file-type idno file-type ", "
-      foreach belief_vector [b -> file-type b file-type ", "]
-      file-print group
-    ]
-
-    ;; Closing file:
-    file-close
-  ]
-
-  ;; Storing network
-  if store_network? [
-    ;; Construct filename:
-    if store_network_filename = "" [set store_network_filename user-input "How do you name file for storing network data?\n(Please, without file extension!)"]
-    let name (word store_network_filename "_" random_stamp ".txt")
-
-    ;; Writing network data into the file:
-    nw:save-matrix name
-  ]
-
-  ;; Storing metadata:
-  if store_metadata? [
-    ;; Construct filename:
-    if store_metadata_filename = "" [set store_metadata_filename user-input "How do you name file for storing metadata?\n(Please, without file extension!)"]
-    let name (word store_metadata_filename "_" random_stamp ".csv")
-
-    ;; Creating file:
-    file-open name
-
-    ;; Writing metadata into the file:
-    file-print (word "num_agents, " num_agents)
-    file-print (word "ticks, " ticks)
-    file-print (word "rand-seed, " rand-seed)
-    file-print (word "max_time, " max_time)
-    file-print (word "network_type, " network_type)
-    file-print (word "min_degree, " min_degree)
-    file-print (word "neis, " neis)
-    file-print (word "rewiring, " rewiring)
-    file-print (word "toroidial_world?, " toroidial_world?)
-    file-print (word "clustering_exp, " clustering_exp)
-    ;file-print (word "Initial_link_goodness, " Initial_link_goodness)
-    file-print (word "set_agents, " set_agents)
-    file-print (word "network_file, " network_file)
-    file-print (word "agent_data, " agent_data)
-    file-print (word "corol_mat_file, " corol_mat_file)
-    file-print (word "k, " k)
-    file-print (word "k_link, " k_link)
-    file-print (word "conformity_tendency, " conformity_tendency)
-    file-print (word "var_of_new_belief, " var_of_new_belief)
-    file-print (word "prob_soc_infl, " prob_soc_infl)
-    file-print (word "prob_self_check, " prob_self_check)
-    file-print (word "link_health_ch, " link_health_ch)
-    file-print (word "drop-bad-link, " drop-bad-link)
-    file-print (word "prob_add_link, " prob_add_link)
-    file-print (word "prob_FoF, " prob_FoF)
-    file-print (word "link_lonely?, " link_lonely?)
-    file-print (word "max_num_links, " max_num_links)
-    file-print (word "no_repeat_link?, " no_repeat_link?)
-
-    ;; Closing file:
-    file-close
-  ]
-
-  ;; Setting back current folder to main folder:
-  if main_folder = "" [
-    user-message "Main folder is not specified, please do it now."
-    set main_folder user-directory
-  ]
-  set-current-directory main_folder
-end
 @#$#@#$#@
 GRAPHICS-WINDOW
 148
 10
-656
-519
+654
+517
 -1
 -1
 5.2631578947368425
@@ -931,23 +821,6 @@ min_degree
 NIL
 HORIZONTAL
 
-BUTTON
-78
-45
-143
-78
-NIL
-STORE!
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
 INPUTBOX
 658
 10
@@ -960,10 +833,10 @@ network.txt
 String
 
 CHOOSER
-3
-471
-144
-516
+4
+399
+145
+444
 set_agents
 set_agents
 "From File" "Random Normal" "Random Uniform" "Bipolar" "Neutral"
@@ -1083,14 +956,14 @@ HORIZONTAL
 
 SLIDER
 903
-650
+663
 1013
-683
+696
 x_belief
 x_belief
 1
 5
-1.0
+2.0
 1
 1
 NIL
@@ -1098,14 +971,14 @@ HORIZONTAL
 
 SLIDER
 1015
-650
+663
 1126
-683
+696
 y_belief
 y_belief
 1
 5
-3.0
+5.0
 1
 1
 NIL
@@ -1113,9 +986,9 @@ HORIZONTAL
 
 PLOT
 785
-685
+698
 1128
-1020
+1033
 attitude space 2d
 NIL
 NIL
@@ -1179,10 +1052,10 @@ Process Parameters
 1
 
 TEXTBOX
-4
-453
-154
-471
+5
+381
+155
+399
 Agent iniitialisation
 11
 0.0
@@ -1216,9 +1089,9 @@ show-new-links?
 
 SLIDER
 785
-649
+662
 898
-682
+695
 fuzz
 fuzz
 0
@@ -1235,7 +1108,7 @@ INPUTBOX
 978
 135
 k
-8.0
+4.0
 1
 0
 Number
@@ -1278,17 +1151,17 @@ belief_shown
 belief_shown
 1
 5
-5.0
+2.0
 1
 1
 NIL
 HORIZONTAL
 
 PLOT
-3
-649
-782
-1020
+8
+1038
+1128
+1409
 Attitude Dynamics
 NIL
 NIL
@@ -1355,7 +1228,7 @@ group_shown
 group_shown
 0
 10
-4.0
+2.0
 1
 1
 NIL
@@ -1446,16 +1319,6 @@ max_time
 0
 Number
 
-TEXTBOX
-10
-385
-104
-403
-Link initialisation
-11
-0.0
-1
-
 SLIDER
 977
 72
@@ -1500,186 +1363,6 @@ no_repeat_link?
 1
 -1000
 
-SWITCH
-1333
-229
-1464
-262
-store_agents?
-store_agents?
-0
-1
--1000
-
-SWITCH
-1332
-290
-1463
-323
-store_network?
-store_network?
-1
-1
--1000
-
-SWITCH
-1331
-348
-1462
-381
-store_metadata?
-store_metadata?
-0
-1
--1000
-
-INPUTBOX
-1157
-289
-1332
-349
-store_network_filename
-network-data
-1
-0
-String
-
-INPUTBOX
-1156
-229
-1332
-289
-store_agents_filename
-agent-data
-1
-0
-String
-
-INPUTBOX
-1156
-348
-1332
-408
-store_metadata_filename
-meta-data
-1
-0
-String
-
-INPUTBOX
-1156
-109
-1464
-169
-storing_folder
-NIL
-1
-0
-String
-
-TEXTBOX
-1156
-80
-1472
-111
-NOTE: If the imput reporters are empty, then NetLogo opens the dialog, where the user might find a folder for storing the data.
-11
-0.0
-1
-
-TEXTBOX
-1333
-262
-1483
-288
-Switch tells whether to store agents data.
-10
-15.0
-1
-
-TEXTBOX
-1332
-323
-1482
-349
-Switch tells whwther to store network data.
-10
-15.0
-1
-
-TEXTBOX
-1332
-381
-1482
-407
-Switch tells whether to store simulation metadata.
-10
-15.0
-1
-
-SWITCH
-1156
-409
-1462
-442
-use_random_stamp?
-use_random_stamp?
-0
-1
--1000
-
-TEXTBOX
-1159
-444
-1465
-519
-NOTE: If this this switch is ON then generates random seed number and adds it at end of all files from one 'STORE!'. I would prefer to use timestamp, but I can't find a way, how to get actual time into NetLogo.\nIf the switch is OFF, then is used 'own_stamp' instead.
-12
-25.0
-1
-
-TEXTBOX
-1156
-13
-1374
-37
-STORING BLOCK:
-20
-0.0
-1
-
-TEXTBOX
-1156
-43
-1472
-74
-Please, don't vrite extensions in '_filename' input reporters. File extensions will be generated automatically.
-12
-35.0
-1
-
-INPUTBOX
-1156
-169
-1464
-229
-main_folder
-NIL
-1
-0
-String
-
-INPUTBOX
-1159
-522
-1460
-582
-own_stamp
-A00001
-1
-0
-String
-
 INPUTBOX
 830
 73
@@ -1701,33 +1384,11 @@ k_link<0!!!
 0.0
 1
 
-MONITOR
-1140
-613
-1224
-658
-NIL
-extremness
-3
-1
-11
-
-MONITOR
-1140
-660
-1224
-705
-NIL
-diversity
-3
-1
-11
-
 PLOT
-1294
-735
-1537
-884
+1193
+161
+1436
+310
 All agents: Output Measures
 NIL
 NIL
@@ -1744,10 +1405,10 @@ PENS
 "coherence" 1.0 0 -2674135 true "" "plot mean [agent-coherence] of turtles"
 
 PLOT
-1294
-884
-1537
-1034
+1193
+310
+1436
+460
 Group 1 Output Measures
 NIL
 NIL
@@ -1764,10 +1425,10 @@ PENS
 "g1_ch" 1.0 0 -2674135 true "" "plot g1_ch"
 
 BUTTON
-1840
-663
-1930
-697
+75
+43
+142
+77
 NIL
 visualize
 NIL
@@ -1781,10 +1442,10 @@ NIL
 1
 
 PLOT
-1508
-50
-1804
-258
+9
+696
+417
+1031
 attitude space 1d
 group
 belief_shown
@@ -1799,10 +1460,10 @@ PENS
 "default" 1.0 2 -16777216 true "" ""
 
 PLOT
-1508
-270
-1803
-515
+426
+698
+777
+1032
 topics
 topic
 belief
@@ -1817,10 +1478,10 @@ PENS
 "default" 1.0 2 -16777216 true "" ""
 
 PLOT
-1249
-584
-1539
-734
+1148
+10
+1438
+160
 extremeness topics
 NIL
 NIL
@@ -1839,10 +1500,10 @@ PENS
 "topic5" 1.0 0 -14835848 true "" "plot mean [abs item 4 belief_vector] of turtles"
 
 PLOT
-1539
-584
-1829
-734
+1438
+10
+1728
+160
 sd topics
 NIL
 NIL
@@ -1861,10 +1522,10 @@ PENS
 "topic5" 1.0 0 -14835848 true "" "plot standard-deviation [item 4 belief_vector] of turtles"
 
 SWITCH
-1508
-515
-1695
-548
+531
+654
+718
+687
 only_group_shown
 only_group_shown
 0
@@ -1872,10 +1533,10 @@ only_group_shown
 -1000
 
 MONITOR
-1803
-50
-1861
-95
+9
+651
+67
+696
 topic
 belief_shown
 17
@@ -1883,32 +1544,21 @@ belief_shown
 11
 
 MONITOR
-1695
-514
-1753
-559
+718
+653
+776
+698
 group
 ifelse-value (only_group_shown) [group_shown] [\"all\"]
 17
 1
 11
 
-MONITOR
-1140
-706
-1224
-751
-coherence
-mean [agent-coherence] of turtles
-3
-1
-11
-
 PLOT
-1294
-1034
-1537
-1184
+1193
+460
+1436
+610
 Group 2 Output Measures
 NIL
 NIL
@@ -1925,10 +1575,10 @@ PENS
 "g2_ch" 1.0 0 -2674135 true "" "plot g2_ch"
 
 PLOT
-1294
-1184
-1537
-1334
+1193
+610
+1436
+760
 Group 3 Output Measures
 NIL
 NIL
@@ -1945,10 +1595,10 @@ PENS
 "g3_ch" 1.0 0 -2674135 true "" "plot g3_ch"
 
 PLOT
-1538
-735
-1781
-885
+1437
+161
+1680
+311
 Group 4 Output Measures
 NIL
 NIL
@@ -1965,10 +1615,10 @@ PENS
 "g4_ch" 1.0 0 -2674135 true "" "plot g4_ch"
 
 PLOT
-1538
-884
-1781
-1034
+1437
+310
+1680
+460
 Group 5 Output Measures
 NIL
 NIL
@@ -1985,10 +1635,10 @@ PENS
 "g5_ch" 1.0 0 -2674135 true "" "plot g5_ch"
 
 PLOT
-1538
-1034
-1781
-1184
+1437
+460
+1680
+610
 Group 6 Output Measures
 NIL
 NIL
@@ -2005,10 +1655,10 @@ PENS
 "g6_ch" 1.0 0 -2674135 true "" "plot g6_ch"
 
 PLOT
-1538
-1184
-1781
-1334
+1437
+610
+1680
+760
 Group 7 Output Measures
 NIL
 NIL
