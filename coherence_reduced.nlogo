@@ -35,6 +35,7 @@ to __SETUP_procedures end
 to setup
 ;- Clear everything
   ca
+  ask patches [set pcolor white]
   if rand-seed = 0 [set rand-seed new-seed]
   random-seed rand-seed
 
@@ -123,53 +124,9 @@ to initialize-comm-network
       ask links [set hidden? not show-new-links?]
       output-print "Initial network set to Watts"
     ]
-    network_type = "Kleinberg" [
-      resize-world 0 (round(sqrt(num_agents)) - 1) 0 (round(sqrt(num_agents)) - 1)
-      nw:generate-small-world turtles links round(sqrt(num_agents)) round(sqrt(num_agents)) 12.0 toroidial_world?
-      (foreach (sort turtles) (sort patches) [ [t p] -> ask t [ move-to p ] ])
-      ask links [set hidden? not show-new-links?]
-      ask turtles [set size 0.5]
-      output-print "Initial network set to Kleinberg"
-    ]
-    network_type = "Barabasi" [
-      resize-world (0 - round(sqrt(num_agents))) round(sqrt(num_agents)) (0 - round(sqrt(num_agents))) round(sqrt(num_agents))
-      nw:generate-preferential-attachment turtles links num_agents min_degree [ fd (round(sqrt(num_agents)) - 1) ]
-      ask links [set hidden? not show-new-links?]
-      output-print "Initial network set to Barabasi"
-    ]
-    network_type = "Random" [
-      resize-world (0 - round(sqrt(num_agents))) round(sqrt(num_agents)) (0 - round(sqrt(num_agents))) round(sqrt(num_agents))
-      nw:generate-random turtles links num_agents rewiring [ fd (round(sqrt(num_agents)) - 1) ]
-      ask links [set hidden? not show-new-links?]
-      output-print "Initial network set to Random"
-    ]
-    network_type = "Planar" [
-      crt num_agents [setxy random-xcor random-ycor]
-      ask turtles [
-        repeat min_degree [
-          ifelse prob rewiring
-            [create-link-with one-of other turtles with [not link-neighbor? myself] [set hidden? not show-new-links?]]
-            [create-link-with (min-one-of (other turtles with [not link-neighbor? myself]) [distance myself]) [set hidden? not show-new-links?]]
-        ]
-      ]
-      output-print "Initial network set to Planar"
-    ]
-    ;; this reads a previoiusly stored network from file
-    network_type = "From File"   [
-      ifelse file-exists? network_file [
-        resize-world (0 - round(sqrt(num_agents))) round(sqrt(num_agents)) (0 - round(sqrt(num_agents))) round(sqrt(num_agents))
-        nw:load-matrix network_file turtles links [ fd (round(sqrt(num_agents)) - 1) ]
-        ask links [set hidden? not show-new-links?]
-        output-print (word "Initial network set using saved file, " network_file)
-      ][error (word "FILE NOT FOUND! You have to put alongside the model file '" network_file "' describing your network") ]
-    ]
     [error "Network type unknown!"]
   )
 
-  ;; Some of the above network methods create slightly the wrong number of agents so cull down to right number -- ***CLUDGE!***
-  if count turtles > num_agents [
-    ask n-of (count turtles - num_agents) turtles [die]
-  ]
   ;; Let's set the common size of the seen world for every type of network:
   set-patch-size world_size / world-width
   if count turtles != num_agents [error (word "Not the right number of turtles! There are: " count turtles)]
@@ -228,8 +185,7 @@ to initialize-agents
   ;; other stuff
   ask turtles [
     set shape "circle"
-    set color (group * 20) + 5
-    ifelse network_type = "Kleinberg" [set size 0.5] [set size 1]
+    set color (group * 30) + 5
   ]
 end
 
@@ -453,113 +409,6 @@ to-report g3_ch
   report group-coherence (3)
 end
 
-to-report g4_ex
-  report group-extremness (4)
-end
-
-to-report g4_dv
-  report group-diversity (4)
-end
-
-to-report g4_ch
-  report group-coherence (4)
-end
-
-to-report g5_ex
-  report group-extremness (5)
-end
-
-to-report g5_dv
-  report group-diversity (5)
-end
-
-to-report g5_ch
-  report group-coherence (5)
-end
-
-to-report g6_ex
-  report group-extremness (6)
-end
-
-to-report g6_dv
-  report group-diversity (6)
-end
-
-to-report g6_ch
-  report group-coherence (6)
-end
-
-to-report g7_ex
-  report group-extremness (7)
-end
-
-to-report g7_dv
-  report group-diversity (7)
-end
-
-to-report g7_ch
-  report group-coherence (7)
-end
-
-to-report g8_ex
-  report group-extremness (8)
-end
-
-to-report g8_dv
-  report group-diversity (8)
-end
-
-to-report g8_ch
-  report group-coherence (8)
-end
-
-to-report g9_ex
-  report group-extremness (9)
-end
-
-to-report g9_dv
-  report group-diversity (9)
-end
-
-to-report g9_ch
-  report group-coherence (9)
-end
-
-to-report g10_ex
-  report group-extremness (10)
-end
-
-to-report g10_dv
-  report group-diversity (10)
-end
-
-to-report g10_ch
-  report group-coherence (10)
-end
-
-to-report g11_ex
-  report group-extremness (11)
-end
-
-to-report g11_dv
-  report group-diversity (11)
-end
-
-to-report g11_ch
-  report group-coherence (11)
-end
-
-to-report g12_ex
-  report group-extremness (12)
-end
-
-to-report g12_dv
-  report group-diversity (12)
-end
-
-to-report g12_ch
-  report group-coherence (12)
-end
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -571,35 +420,36 @@ to visualize
   if not visualisations? [stop]
   set-current-plot "attitude space 2d"
   clear-plot
-  set-plot-background-color 0
+  set-plot-background-color white
   ask turtles [
-    set-plot-pen-color (group * 20) + 5
+    set-plot-pen-color (group * 30) + 5
     plotxy (some_fuzz + item (x_belief - 1) belief_vector) (some_fuzz + item (y_belief  - 1) belief_vector)
   ]
 
   set-current-plot "attitude space 1d"
   clear-plot
-  set-plot-background-color 0
+  set-plot-background-color white
   ask turtles [
-    set-plot-pen-color (group * 20) + 5
+    set-plot-pen-color (group * 30) + 5
     plotxy (some_fuzz + group / max [group] of turtles) (some_fuzz + item (belief_shown  - 1) belief_vector)
   ]
 
   set-current-plot "topics"
   clear-plot
-  set-plot-background-color 0
+  set-plot-background-color white
   ask ifelse-value (only_group_shown) [turtles with [group = group_shown]] [turtles] [
-    set-plot-pen-color (group * 20) + 5
+    set-plot-pen-color (group * 30) + 5
     (foreach (n-values length belief_vector [ i -> (i + 0.5) / length belief_vector ]) (belief_vector) [ [x y] -> plotxy x + some_fuzz y])
   ]
 
   set-current-plot "Attitude Dynamics"
+  set-plot-background-color white
   let ts no-turtles
   ifelse group_shown < 1
     [set ts turtles]
     [set ts turtles with [group = group_shown]]
   ask ts [
-    set-plot-pen-color (group * 20) + 5
+    set-plot-pen-color (group * 30) + 5
     plotxy ticks item (belief_shown - 1) belief_vector
   ]
 end
@@ -659,8 +509,8 @@ end
 GRAPHICS-WINDOW
 148
 10
-656
-519
+654
+517
 -1
 -1
 5.2631578947368425
@@ -741,14 +591,14 @@ CHOOSER
 206
 network_type
 network_type
-"Random" "Watts" "Kleinberg" "Barabasi" "Planar" "From File"
-1
+"Watts"
+0
 
 SLIDER
 4
-241
+205
 142
-274
+238
 neis
 neis
 1
@@ -761,56 +611,15 @@ HORIZONTAL
 
 SLIDER
 4
-275
-146
-308
+238
+141
+271
 rewiring
 rewiring
 0
 1
-0.1
+0.05
 0.001
-1
-NIL
-HORIZONTAL
-
-SWITCH
-3
-309
-146
-342
-toroidial_world?
-toroidial_world?
-1
-1
--1000
-
-SLIDER
-3
-343
-146
-376
-clustering_exp
-clustering_exp
-0.01
-10
-0.01
-0.01
-1
-NIL
-HORIZONTAL
-
-SLIDER
-4
-207
-143
-240
-min_degree
-min_degree
-1
-10
-10.0
-1
 1
 NIL
 HORIZONTAL
@@ -827,13 +636,13 @@ network.txt
 String
 
 CHOOSER
-4
-399
-145
-444
+6
+300
+147
+345
 set_agents
 set_agents
-"From File" "Random Normal" "Random Uniform" "Bipolar" "Neutral"
+"From File"
 0
 
 INPUTBOX
@@ -842,7 +651,7 @@ INPUTBOX
 973
 70
 agent_data
-DE/itemsCCA.csv
+ns_DE/itemsCCA.csv
 1
 0
 String
@@ -853,7 +662,7 @@ INPUTBOX
 1126
 70
 corol_mat_file
-DE/correlationsCCA.csv
+ns_DE/correlationsCCA.csv
 1
 0
 String
@@ -957,7 +766,7 @@ x_belief
 x_belief
 1
 5
-2.0
+3.0
 1
 1
 NIL
@@ -1046,10 +855,10 @@ Process Parameters
 1
 
 TEXTBOX
-5
-381
-155
-399
+7
+282
+157
+300
 Agent iniitialisation
 11
 0.0
@@ -1221,8 +1030,8 @@ SLIDER
 group_shown
 group_shown
 0
-10
-2.0
+3
+3.0
 1
 1
 NIL
@@ -1379,9 +1188,9 @@ k_link<0!!!
 1
 
 PLOT
-1193
+1148
 161
-1436
+1420
 310
 All agents: Output Measures
 NIL
@@ -1399,7 +1208,7 @@ PENS
 "coherence" 1.0 0 -2674135 true "" "plot mean [agent-coherence] of turtles"
 
 PLOT
-1193
+1143
 310
 1436
 460
@@ -1414,15 +1223,15 @@ true
 true
 "" ""
 PENS
-"g1_ex" 1.0 0 -16777216 true "" "plot g1_ex"
-"g1_dv" 1.0 0 -7500403 true "" "plot g1_dv"
-"g1_ch" 1.0 0 -2674135 true "" "plot g1_ch"
+"g1: extremness" 1.0 0 -16777216 true "" "plot g1_ex"
+"g1: diversity" 1.0 0 -7500403 true "" "plot g1_dv"
+"g1: coherence" 1.0 0 -2674135 true "" "plot g1_ch"
 
 BUTTON
-75
-43
-142
-77
+78
+44
+143
+78
 NIL
 visualize
 NIL
@@ -1451,7 +1260,7 @@ false
 false
 "" ""
 PENS
-"default" 1.0 2 -16777216 true "" ""
+"default" 1.0 2 -1 true "" ""
 
 PLOT
 426
@@ -1474,7 +1283,7 @@ PENS
 PLOT
 1148
 10
-1438
+1397
 160
 extremeness topics
 NIL
@@ -1494,11 +1303,11 @@ PENS
 "topic5" 1.0 0 -14835848 true "" "plot mean [abs item 4 belief_vector] of turtles"
 
 PLOT
-1438
+1436
 10
-1728
+1677
 160
-sd topics
+diversity of topics
 NIL
 NIL
 0.0
@@ -1549,10 +1358,10 @@ ifelse-value (only_group_shown) [group_shown] [\"all\"]
 11
 
 PLOT
-1193
-460
-1436
-610
+1430
+160
+1719
+310
 Group 2 Output Measures
 NIL
 NIL
@@ -1564,15 +1373,15 @@ true
 true
 "" ""
 PENS
-"g2_ex" 1.0 0 -16777216 true "" "plot g2_ex"
-"g2_dv" 1.0 0 -7500403 true "" "plot g2_dv"
-"g2_ch" 1.0 0 -2674135 true "" "plot g2_ch"
+"g2: extremness" 1.0 0 -16777216 true "" "plot g2_ex"
+"g2: diversity" 1.0 0 -7500403 true "" "plot g2_dv"
+"g2: coherence" 1.0 0 -2674135 true "" "plot g2_ch"
 
 PLOT
-1193
-610
-1436
-760
+1435
+310
+1719
+460
 Group 3 Output Measures
 NIL
 NIL
@@ -1584,89 +1393,9 @@ true
 true
 "" ""
 PENS
-"g3_ex" 1.0 0 -16777216 true "" "plot g3_ex"
-"g3_dv" 1.0 0 -7500403 true "" "plot g3_dv"
-"g3_ch" 1.0 0 -2674135 true "" "plot g3_ch"
-
-PLOT
-1437
-161
-1680
-311
-Group 4 Output Measures
-NIL
-NIL
-0.0
-10.0
-0.0
-1.0
-true
-true
-"" ""
-PENS
-"g4_ex" 1.0 0 -16777216 true "" "plot g4_ex"
-"g4_dv" 1.0 0 -7500403 true "" "plot g4_dv"
-"g4_ch" 1.0 0 -2674135 true "" "plot g4_ch"
-
-PLOT
-1437
-310
-1680
-460
-Group 5 Output Measures
-NIL
-NIL
-0.0
-10.0
-0.0
-1.0
-true
-true
-"" ""
-PENS
-"g5_ex" 1.0 0 -16777216 true "" "plot g5_ex"
-"g5_dv" 1.0 0 -7500403 true "" "plot g5_dv"
-"g5_ch" 1.0 0 -2674135 true "" "plot g5_ch"
-
-PLOT
-1437
-460
-1680
-610
-Group 6 Output Measures
-NIL
-NIL
-0.0
-10.0
-0.0
-1.0
-true
-true
-"" ""
-PENS
-"g6_ex" 1.0 0 -16777216 true "" "plot g6_ex"
-"g6_dv" 1.0 0 -7500403 true "" "plot g6_dv"
-"g6_ch" 1.0 0 -2674135 true "" "plot g6_ch"
-
-PLOT
-1437
-610
-1680
-760
-Group 7 Output Measures
-NIL
-NIL
-0.0
-10.0
-0.0
-1.0
-true
-true
-"" ""
-PENS
-"g7_ex" 1.0 0 -16777216 true "" "plot g7_ex"
-"g7_dv" 1.0 0 -7500403 true "" "plot g7_dv"
-"g7_ch" 1.0 0 -2674135 true "" "plot g7_ch"
+"g3: extremness" 1.0 0 -16777216 true "" "plot g3_ex"
+"g3: diversity" 1.0 0 -7500403 true "" "plot g3_dv"
+"g3: coherence" 1.0 0 -2674135 true "" "plot g3_ch"
 
 @#$#@#$#@
 ## This version (BE)
