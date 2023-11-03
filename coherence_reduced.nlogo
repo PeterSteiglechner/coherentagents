@@ -1,6 +1,6 @@
 ;;;;; Model using coherence agents -- version accompanying the paper
 
-;; Updated: 2023-10-13 FranCesko
+;; Updated: 2023-11-03 FranCesko
 
 
 ;; HEADER STUFF
@@ -162,23 +162,6 @@ to initialize-agents
     set_agents = "From File" [
       output-print (word "Agent beliefs set from file: " agent_data)
     ]
-    set_agents = "Random Normal" [
-      ask turtles [set belief_vector n-values num_items [rand-norm-val]]
-      output-print "Agent beliefs set using random normal values"
-    ]
-    set_agents = "Random Uniform" [
-      ask turtles [set belief_vector n-values num_items [rand-unif-val]]
-      output-print "Agent beliefs set using random uniform values"
-    ]
-    set_agents = "Bipolar" [
-      ask turtles [set belief_vector n-values num_items [rand-bipolar-val]]
-      output-print "Agent beliefs set using random bipolar values"
-    ]
-    set_agents = "Neutral" [
-      ask turtles [set belief_vector n-values num_items [0]]
-      output-print "Agent beliefs set to 0"
-    ]
-    ; elsecommands: set_agents = "random"
     [
       error (word "Agent initialisation method " set_agents " not implemented!")
     ])
@@ -359,6 +342,10 @@ to-report diversity
   report mean map [x -> standard-deviation [item x belief_vector] of turtles] range num_items
 end
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;      Group Measures           ;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 to __GROUP_measures end
 
 to-report group-extremness [grp]
@@ -468,36 +455,9 @@ end
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 to __UTILITY_procedures end
 
-to-report rand-norm-val
-  ;; produces a random normal in [-1, 1], av 0 sd 1/3
-  report force-range random-normal 0 0.333333333
-end
-
-to-report force-range [vl]
-  report min list 1 max list -1 vl
-end
-
-to-report rand-unif-val
-  ;; produces a random val from [-1, 1] ;; but not 1!
-  report (random-float 2) - 1
-end
-
-to-report rand-bipolar-val
-  ;; uses rand-norm-val to produce values tending araound -1 and 1
-  let bp rand-norm-val
-  ifelse bp > 0
-    [report 1 - bp]
-    [report -1 - bp]
-end
-
 to-report logistic [vl steepness-k]
   ;; the logistic function
   report 1 / ( 1 + exp (- steepness-k * vl))
-end
-
-to-report linear [vl]
-  ;; the linear function from [-1, 1] tp [0, 1]
-  report (1 + vl) / 2
 end
 
 to-report prob [vl]
@@ -509,8 +469,8 @@ end
 GRAPHICS-WINDOW
 148
 10
-654
-517
+656
+519
 -1
 -1
 5.2631578947368425
@@ -534,10 +494,10 @@ ticks
 30.0
 
 BUTTON
-5
-10
-72
-43
+0
+381
+67
+414
 NIL
 setup
 NIL
@@ -551,10 +511,10 @@ NIL
 1
 
 BUTTON
-78
-10
-143
-43
+73
+381
+138
+414
 NIL
 go
 T
@@ -568,10 +528,10 @@ NIL
 0
 
 BUTTON
-5
-44
-72
-77
+0
+415
+67
+448
 step
 go
 NIL
@@ -924,10 +884,10 @@ OUTPUT
 12
 
 INPUTBOX
-6
-81
-79
-141
+1
+452
+74
+512
 rand-seed
 1.0
 1
@@ -946,15 +906,15 @@ secs-per-tick
 11
 
 SLIDER
-3
-574
-131
-607
+6
+576
+134
+609
 belief_shown
 belief_shown
 1
 5
-2.0
+3.0
 1
 1
 NIL
@@ -979,10 +939,10 @@ PENS
 "default" 1.0 2 -16777216 true "" ""
 
 SWITCH
-2
-540
-130
-573
+5
+542
+133
+575
 visualisations?
 visualisations?
 0
@@ -1023,10 +983,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-4
-610
-133
-643
+7
+612
+136
+645
 group_shown
 group_shown
 0
@@ -1102,20 +1062,20 @@ count links / num_agents
 11
 
 TEXTBOX
-7
-521
-157
-539
+10
+523
+160
+541
 Vizualisation Stuff\n
 11
 0.0
 1
 
 INPUTBOX
-83
-81
-147
-141
+78
+452
+142
+512
 max_time
 200.0
 1
@@ -1188,10 +1148,10 @@ k_link<0!!!
 1
 
 PLOT
-1148
-161
-1420
-310
+1141
+816
+1413
+965
 All agents: Output Measures
 NIL
 NIL
@@ -1208,10 +1168,10 @@ PENS
 "coherence" 1.0 0 -2674135 true "" "plot mean [agent-coherence] of turtles"
 
 PLOT
-1143
-310
-1436
-460
+1136
+965
+1429
+1115
 Group 1 Output Measures
 NIL
 NIL
@@ -1228,10 +1188,10 @@ PENS
 "g1: coherence" 1.0 0 -2674135 true "" "plot g1_ch"
 
 BUTTON
-78
-44
-143
-78
+73
+415
+138
+449
 NIL
 visualize
 NIL
@@ -1281,10 +1241,10 @@ PENS
 "default" 1.0 2 -16777216 true "" ""
 
 PLOT
-1148
-10
-1397
-160
+1141
+665
+1390
+815
 extremeness topics
 NIL
 NIL
@@ -1303,10 +1263,10 @@ PENS
 "topic5" 1.0 0 -14835848 true "" "plot mean [abs item 4 belief_vector] of turtles"
 
 PLOT
-1436
-10
-1677
-160
+1429
+665
+1670
+815
 diversity of topics
 NIL
 NIL
@@ -1358,10 +1318,10 @@ ifelse-value (only_group_shown) [group_shown] [\"all\"]
 11
 
 PLOT
-1430
-160
-1719
-310
+1423
+815
+1712
+965
 Group 2 Output Measures
 NIL
 NIL
@@ -1378,10 +1338,10 @@ PENS
 "g2: coherence" 1.0 0 -2674135 true "" "plot g2_ch"
 
 PLOT
-1435
-310
-1719
-460
+1428
+965
+1712
+1115
 Group 3 Output Measures
 NIL
 NIL
