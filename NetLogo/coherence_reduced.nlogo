@@ -467,10 +467,10 @@ to-report prob [vl]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-148
-10
-656
-519
+165
+787
+673
+1296
 -1
 -1
 5.2631578947368425
@@ -495,9 +495,9 @@ ticks
 
 BUTTON
 0
-381
+10
 67
-414
+43
 NIL
 setup
 NIL
@@ -512,9 +512,9 @@ NIL
 
 BUTTON
 73
-381
+10
 138
-414
+43
 NIL
 go
 T
@@ -529,9 +529,9 @@ NIL
 
 BUTTON
 0
-415
+44
 67
-448
+77
 step
 go
 NIL
@@ -545,20 +545,20 @@ NIL
 0
 
 CHOOSER
-4
-161
-141
-206
+0
+797
+137
+842
 network_type
 network_type
 "Watts"
 0
 
 SLIDER
-4
-205
-142
-238
+0
+841
+138
+874
 neis
 neis
 1
@@ -570,10 +570,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-4
-238
-141
-271
+0
+874
+137
+907
 rewiring
 rewiring
 0
@@ -584,54 +584,43 @@ rewiring
 NIL
 HORIZONTAL
 
-INPUTBOX
-658
-10
-820
-82
-network_file
-network.txt
-1
-0
-String
-
 CHOOSER
-6
-300
-147
-345
+2
+936
+143
+981
 set_agents
 set_agents
 "From File"
 0
 
 INPUTBOX
-821
-10
-973
-70
+818
+810
+990
+870
 agent_data
-ns_DE/itemsCCA.csv
+itemsCCA.csv
 1
 0
 String
 
 INPUTBOX
-977
-10
-1126
-70
+818
+870
+991
+930
 corol_mat_file
-ns_DE/correlationsCCA.csv
+correlationsCCA.csv
 1
 0
 String
 
 SLIDER
-807
-178
-975
-211
+824
+955
+992
+988
 conformity_tendency
 conformity_tendency
 0
@@ -643,10 +632,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-807
-213
-976
-246
+824
+990
+993
+1023
 var_of_new_belief
 var_of_new_belief
 0
@@ -658,10 +647,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-806
-248
-976
-281
+823
+1025
+993
+1058
 prob_soc_infl
 prob_soc_infl
 0
@@ -673,10 +662,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-806
-283
-974
-316
+823
+1060
+991
+1093
 prob_self_check
 prob_self_check
 0
@@ -688,10 +677,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-979
-144
-1126
-177
+996
+921
+1143
+954
 prob_add_link
 prob_add_link
 0
@@ -703,10 +692,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-978
-108
-1128
-141
+995
+885
+1145
+918
 drop-bad-link
 drop-bad-link
 0
@@ -718,25 +707,25 @@ NIL
 HORIZONTAL
 
 SLIDER
-903
-663
-1013
-696
+1051
+21
+1161
+54
 x_belief
 x_belief
 1
 5
-3.0
+2.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-1015
-663
-1126
-696
+1163
+21
+1274
+54
 y_belief
 y_belief
 1
@@ -748,10 +737,10 @@ NIL
 HORIZONTAL
 
 PLOT
-785
-698
-1128
-1033
+933
+60
+1276
+395
 attitude space 2d
 NIL
 NIL
@@ -766,10 +755,10 @@ PENS
 "default" 1.0 2 -16777216 true "" ""
 
 SWITCH
-659
-180
-801
-213
+676
+957
+818
+990
 show-old-links?
 show-old-links?
 1
@@ -777,10 +766,10 @@ show-old-links?
 -1000
 
 PLOT
-148
-522
-308
-642
+165
+1300
+325
+1420
 Links per agent
 NIL
 NIL
@@ -795,40 +784,40 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot count links / count turtles"
 
 TEXTBOX
-7
-146
-157
-164
+3
+782
+153
+800
 Network Parameters
 11
 0.0
 1
 
 TEXTBOX
-816
-154
-962
-172
+829
+941
+975
+959
 Process Parameters
 11
 0.0
 1
 
 TEXTBOX
-7
-282
-157
-300
+3
+918
+153
+936
 Agent iniitialisation
 11
 0.0
 1
 
 SLIDER
-979
-248
-1127
-281
+996
+1025
+1144
+1058
 max_num_links
 max_num_links
 0
@@ -840,10 +829,10 @@ NIL
 HORIZONTAL
 
 SWITCH
-660
-214
-801
-247
+677
+991
+818
+1024
 show-new-links?
 show-new-links?
 1
@@ -851,10 +840,10 @@ show-new-links?
 -1000
 
 SLIDER
-785
-662
-898
-695
+933
+20
+1046
+53
 fuzz
 fuzz
 0
@@ -866,10 +855,10 @@ NIL
 HORIZONTAL
 
 INPUTBOX
-911
-75
-978
-135
+70
+255
+137
+315
 k
 10.0
 1
@@ -877,17 +866,17 @@ k
 Number
 
 OUTPUT
-664
-323
-1125
-647
+681
+1100
+1142
+1424
 12
 
 INPUTBOX
 1
-452
+81
 74
-512
+141
 rand-seed
 1.0
 1
@@ -895,10 +884,10 @@ rand-seed
 Number
 
 MONITOR
-659
-82
-709
-127
+676
+859
+726
+904
 s/tck
 secs-per-tick
 3
@@ -906,10 +895,10 @@ secs-per-tick
 11
 
 SLIDER
-6
-576
-134
-609
+157
+20
+285
+53
 belief_shown
 belief_shown
 1
@@ -921,15 +910,15 @@ NIL
 HORIZONTAL
 
 PLOT
-8
-1038
-1128
-1409
+157
+401
+739
+757
 Attitude Dynamics
 NIL
 NIL
 0.0
-1.0
+201.0
 -1.0
 1.0
 true
@@ -939,10 +928,10 @@ PENS
 "default" 1.0 2 -16777216 true "" ""
 
 SWITCH
-5
-542
-133
-575
+1
+181
+129
+214
 visualisations?
 visualisations?
 0
@@ -950,10 +939,10 @@ visualisations?
 -1000
 
 PLOT
-313
-523
-484
-643
+330
+1300
+501
+1420
 Histogram Node Arities
 NIL
 NIL
@@ -968,10 +957,10 @@ PENS
 "default" 1.0 1 -16777216 true "" "histogram [count my-links] of turtles"
 
 SLIDER
-662
-248
-800
-281
+679
+1025
+817
+1058
 rearrange_every
 rearrange_every
 0
@@ -983,25 +972,25 @@ NIL
 HORIZONTAL
 
 SLIDER
-7
-612
-136
-645
+728
+20
+820
+53
 group_shown
 group_shown
 0
 3
-3.0
+0.0
 1
 1
 NIL
 HORIZONTAL
 
 BUTTON
-661
-283
-798
-316
+678
+1060
+815
+1093
 Re-arrange Now
 rearrange
 NIL
@@ -1015,21 +1004,21 @@ NIL
 1
 
 SWITCH
-980
-214
-1126
-247
+997
+991
+1143
+1024
 link_lonely?
 link_lonely?
-1
+0
 1
 -1000
 
 SLIDER
-979
-179
-1126
-212
+996
+956
+1143
+989
 prob_FoF
 prob_FoF
 0
@@ -1041,20 +1030,20 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-665
-165
-760
-183
+682
+942
+777
+960
 World Viz Params
 11
 0.0
 1
 
 MONITOR
-712
-82
-764
-127
+729
+859
+781
+904
 lnks/ag
 count links / num_agents
 2
@@ -1062,10 +1051,10 @@ count links / num_agents
 11
 
 TEXTBOX
-10
-523
-160
-541
+6
+162
+156
+180
 Vizualisation Stuff\n
 11
 0.0
@@ -1073,9 +1062,9 @@ Vizualisation Stuff\n
 
 INPUTBOX
 78
-452
+81
 142
-512
+141
 max_time
 200.0
 1
@@ -1083,10 +1072,10 @@ max_time
 Number
 
 SLIDER
-977
-72
-1126
-105
+994
+849
+1143
+882
 link_health_ch
 link_health_ch
 0
@@ -1098,10 +1087,10 @@ NIL
 HORIZONTAL
 
 PLOT
-488
-524
-660
-646
+505
+1301
+677
+1423
 Histogram Link Health
 NIL
 NIL
@@ -1116,10 +1105,10 @@ PENS
 "default" 1.0 1 -16777216 true "" "histogram [link_health] of links"
 
 SWITCH
-981
-285
-1128
-318
+998
+1062
+1145
+1095
 no_repeat_link?
 no_repeat_link?
 1
@@ -1127,10 +1116,10 @@ no_repeat_link?
 -1000
 
 INPUTBOX
-830
-73
-896
-133
+0
+255
+66
+315
 k_link
 -1.0
 1
@@ -1138,20 +1127,20 @@ k_link
 Number
 
 TEXTBOX
-833
-135
-983
+3
+326
 153
+344
 k_link<0!!!
 12
 0.0
 1
 
 PLOT
-1141
-816
-1413
-965
+747
+519
+1018
+639
 All agents: Output Measures
 NIL
 NIL
@@ -1168,10 +1157,10 @@ PENS
 "coherence" 1.0 0 -2674135 true "" "plot mean [agent-coherence] of turtles"
 
 PLOT
-1136
-965
-1429
-1115
+743
+638
+1036
+758
 Group 1 Output Measures
 NIL
 NIL
@@ -1189,9 +1178,9 @@ PENS
 
 BUTTON
 73
-415
+44
 138
-449
+78
 NIL
 visualize
 NIL
@@ -1205,10 +1194,10 @@ NIL
 1
 
 PLOT
-9
-696
-417
-1031
+157
+58
+565
+393
 attitude space 1d
 group
 belief_shown
@@ -1223,10 +1212,10 @@ PENS
 "default" 1.0 2 -1 true "" ""
 
 PLOT
-426
-698
-777
-1032
+574
+60
+925
+394
 topics
 topic
 belief
@@ -1241,10 +1230,10 @@ PENS
 "default" 1.0 2 -16777216 true "" ""
 
 PLOT
-1141
-665
-1390
-815
+743
+401
+992
+521
 extremeness topics
 NIL
 NIL
@@ -1263,10 +1252,10 @@ PENS
 "topic5" 1.0 0 -14835848 true "" "plot mean [abs item 4 belief_vector] of turtles"
 
 PLOT
-1429
-665
-1670
-815
+1031
+401
+1272
+521
 diversity of topics
 NIL
 NIL
@@ -1285,21 +1274,21 @@ PENS
 "topic5" 1.0 0 -14835848 true "" "plot standard-deviation [item 4 belief_vector] of turtles"
 
 SWITCH
-531
-654
-718
-687
+574
+20
+711
+53
 only_group_shown
 only_group_shown
-0
+1
 1
 -1000
 
 MONITOR
-9
-651
-67
-696
+507
+10
+565
+55
 topic
 belief_shown
 17
@@ -1307,10 +1296,10 @@ belief_shown
 11
 
 MONITOR
-718
-653
-776
-698
+867
+12
+925
+57
 group
 ifelse-value (only_group_shown) [group_shown] [\"all\"]
 17
@@ -1318,10 +1307,10 @@ ifelse-value (only_group_shown) [group_shown] [\"all\"]
 11
 
 PLOT
-1423
-815
-1712
-965
+1035
+519
+1318
+639
 Group 2 Output Measures
 NIL
 NIL
@@ -1338,10 +1327,10 @@ PENS
 "g2: coherence" 1.0 0 -2674135 true "" "plot g2_ch"
 
 PLOT
-1428
-965
-1712
-1115
+1035
+638
+1319
+758
 Group 3 Output Measures
 NIL
 NIL
@@ -1357,26 +1346,46 @@ PENS
 "g3: diversity" 1.0 0 -7500403 true "" "plot g3_dv"
 "g3: coherence" 1.0 0 -2674135 true "" "plot g3_ch"
 
+TEXTBOX
+1000
+832
+1150
+860
+Link parameters
+11
+0.0
+1
+
+TEXTBOX
+833
+796
+983
+814
+Data files (relative paths)
+11
+0.0
+1
+
+TEXTBOX
+3
+238
+153
+256
+Logistic parameters\n
+11
+0.0
+1
+
 @#$#@#$#@
-## This version (BE)
+## This version 
 
-Builds upon and messes with Frantisek's version :-)
-
-V ...2.1 adds an option to not check if a link aleady exists when making new link - speeds things up a lot! :-)
-
-This adds parameters and visualisations, but most importantly it does link dropping differently, namely:
-
-* Links have a variable: *link_health* ranging from -1 to 1
-* During interaction the *link_health* is updated by the coherence of the suggested belief with the recipients beliefs (**not** the difference in coherence)
-* Each time tick each link can die with probability linked to its health *(drop-bad-link x logistic link_health)*
-
-This logistic uses the same *k* as the logistic used in other coherence difference -> prob calculations. To facilitate the above process the *change-belief* procedure is changed into a function, that does the same as before but returns the coherence of the suggested belief with recipient's beliefs (so we do not calculate it twice).
+Reduced and cleaned model to correctly fit the JASSS manuscript.
 
 ## Files needed for the correct run of model:
 - netLogo model: main file with the model code 
-- `Correlationmatrix.csv`: contains coherence matrices for 6 groups estimated from ESS 9 Germany (2018)
-- `agents.csv`: contains data on 5 believes, estimated group (1--6), and ID (just for ability to connect it with used data, nothing important for the model run) from ESS 9 Germany (2018) 
-- `network.txt`: file storing network structure -- by the button `save network` you might save present network structure, but you also might generate your own network structure (unweighted, just 1/0 informing of existence of links)
+- `correlationsCCA.csv`: contains coherence matrices for 3 groups estimated from ESS 9 Germany (2018)
+- `itemsCCA.csv`: contains data on 5 believes, estimated group (1--3), and ID (just for ability to connect it with used data, nothing important for the model run) from ESS 9 Germany (2018) 
+
 
 ## The purpose of the model  
   
@@ -1425,7 +1434,6 @@ All agents update their believes and the next round starts.
 
 - *agent_data*: the filename for the agent data - first row number of subjects, then field labels, then row for each subject: id, the value of each item and its group number
 - *corol_mat_file*: the filename for the data file with the correlation matricies for each group 
-- *network_file*: the filename to save and/or restore the network from
 
 
 ### Initial Network

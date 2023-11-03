@@ -45,7 +45,7 @@ write_ABM_data <- function(country, attitudenames) {
 
 write_ABM_data("DE",attitudenames)
 ## The following writes out groups for all countries
-cntrynames |> map(\(x) write_ABM_data(x,attitudenames))
+# cntrynames |> map(\(x) write_ABM_data(x,attitudenames))
 
 
 ## Eigenvector Analysis
