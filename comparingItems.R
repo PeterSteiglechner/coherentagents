@@ -53,9 +53,7 @@ count(tb, group.x, group.y) %>%
   scale_x_continuous(breaks = 1:7, limits = c(0.5, 7.5)) +
   scale_y_continuous(breaks = 1:3, limits = c(0.5, 3.5)) +
   guides(col = 'none') +
-  labs(x = "Old groups 'DE/'", y = "New groups 'ns_DE/'", 
-       title = "Mapping of the old and new groups",
-       caption = "Note: Circle sizes and numbers represent counts of respondents.") +
+  labs(x = "7-CAA", y = "3-CAA") +
   theme_classic()
 
 ggsave("groupsMapping.png", units = "px", width = 3000, height = 2000)
