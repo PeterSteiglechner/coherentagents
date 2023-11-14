@@ -28,8 +28,8 @@ library(tidyverse)
 ## Reading data in and joining files:
 tb1 = read_csv("DE/itemsCCA.csv") %>% 
   mutate(group = recode(group, `1` = 4, `2` = 1, `3` = 2, `4` = 6, `5` = 7, `6` = 5, `7` = 3))
-tb2 = read_csv("ns_DE/itemsCCA.csv") %>% select(-idno) %>% 
-  mutate(group = recode(group, `2` = 3, `3` = 2)) 
+tb2 = read_csv("ns_DE/itemsCCA.csv") %>% select(-idno) #%>% 
+  # mutate(group = recode(group, `2` = 3, `3` = 2)) 
 tb = right_join(tb1, tb2, by = c("freehms", "gincdif", "lrscale", "impcntr", "euftf")) %>% unique()
 
 
