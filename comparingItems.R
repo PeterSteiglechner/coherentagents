@@ -28,8 +28,8 @@ library(tidyverse)
 ## Reading data in and joining files:
 tb1 = read_csv("DE/itemsCCA.csv") %>% 
   mutate(group = recode(group, `1` = 4, `2` = 1, `3` = 2, `4` = 6, `5` = 7, `6` = 5, `7` = 3))
-tb2 = read_csv("ns_DE/itemsCCA.csv") %>% select(-idno) #%>% 
-  # mutate(group = recode(group, `2` = 3, `3` = 2)) 
+tb2 = read_csv("ns_DE/itemsCCA.csv") %>% select(-idno) %>% 
+  mutate(group = recode(group, `1` = "1 (n=1040)", `2` = "2 (n=601)", `3` = "3 (n=562)"))
 tb = right_join(tb1, tb2, by = c("freehms", "gincdif", "lrscale", "impcntr", "euftf")) %>% unique()
 
 
@@ -51,7 +51,7 @@ count(tb, group.x, group.y) %>%
   geom_text(size = 5) +
   scale_size_identity() +
   scale_x_continuous(breaks = 1:7, limits = c(0.5, 7.5)) +
-  scale_y_continuous(breaks = 1:3, limits = c(0.5, 3.5)) +
+  # scale_y_continuous(breaks = 1:3, limits = c(0.5, 3.5)) +
   guides(col = 'none') +
   labs(x = "7-CAA", y = "3-CAA") +
   theme_classic()
