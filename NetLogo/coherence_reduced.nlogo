@@ -360,6 +360,10 @@ to-report group-coherence [grp]
   report ifelse-value (max table:keys coherency_matrices >= grp) [mean [agent-coherence] of turtles with [group = grp]]["NA"]
 end
 
+to-report grp-op [grp op]
+  report ifelse-value (max table:keys coherency_matrices >= grp) [mean [item op belief_vector] of turtles with [group = grp]]["NA"]
+end
+
 to-report g1_ex
   report group-extremness (1)
 end
@@ -625,7 +629,7 @@ conformity_tendency
 conformity_tendency
 0
 1
-0.2
+1.0
 0.05
 1
 NIL
@@ -715,7 +719,7 @@ x_belief
 x_belief
 1
 5
-2.0
+1.0
 1
 1
 NIL
@@ -903,7 +907,7 @@ belief_shown
 belief_shown
 1
 5
-3.0
+5.0
 1
 1
 NIL
@@ -980,7 +984,7 @@ group_shown
 group_shown
 0
 3
-0.0
+2.0
 1
 1
 NIL
@@ -1280,7 +1284,7 @@ SWITCH
 53
 only_group_shown
 only_group_shown
-1
+0
 1
 -1000
 
@@ -1375,6 +1379,252 @@ Logistic parameters\n
 11
 0.0
 1
+
+PLOT
+1372
+130
+1572
+250
+plot 2.1
+NIL
+NIL
+-1.0
+1.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 0.5 1 -16777216 true "" "histogram [item 1 belief_vector] of turtles with [group = 2]"
+
+PLOT
+1372
+249
+1572
+369
+plot 2.2
+NIL
+NIL
+-1.0
+1.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 0.5 1 -16777216 true "" "histogram [item 2 belief_vector] of turtles with [group = 2]"
+
+PLOT
+1372
+368
+1572
+488
+plot 2.3
+NIL
+NIL
+-1.0
+1.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 0.5 1 -16777216 true "" "histogram [item 3 belief_vector] of turtles with [group = 2]"
+
+PLOT
+1372
+487
+1572
+607
+plot 2.4
+NIL
+NIL
+-1.0
+1.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 0.5 1 -16777216 true "" "histogram [item 4 belief_vector] of turtles with [group = 2]"
+
+PLOT
+1372
+13
+1572
+133
+plot 2.0
+NIL
+NIL
+-1.0
+1.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 0.5 1 -16777216 true "" "histogram [item 0 belief_vector] of turtles with [group = 2]"
+
+PLOT
+1572
+130
+1772
+250
+plot 3.1
+NIL
+NIL
+-1.0
+1.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 0.5 1 -16777216 true "" "histogram [item 1 belief_vector] of turtles with [group = 3]"
+
+PLOT
+1572
+249
+1772
+369
+plot 3.2
+NIL
+NIL
+-1.0
+1.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 0.5 1 -16777216 true "" "histogram [item 2 belief_vector] of turtles with [group = 3]"
+
+PLOT
+1572
+368
+1772
+488
+plot 3.3
+NIL
+NIL
+-1.0
+1.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 0.5 1 -16777216 true "" "histogram [item 3 belief_vector] of turtles with [group = 3]"
+
+PLOT
+1572
+487
+1772
+607
+plot 3.4
+NIL
+NIL
+-1.0
+1.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 0.5 1 -16777216 true "" "histogram [item 4 belief_vector] of turtles with [group = 3]"
+
+PLOT
+1572
+13
+1772
+133
+plot 3.0
+NIL
+NIL
+-1.0
+1.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 0.5 1 -16777216 true "" "histogram [item 0 belief_vector] of turtles with [group = 3]"
+
+PLOT
+1373
+609
+1533
+822
+Opinion Grp 1
+NIL
+NIL
+0.0
+10.0
+0.0
+1.0
+true
+true
+"" ""
+PENS
+"op1" 1.0 0 -16777216 true "" "plot grp-op (1) (0)"
+"op2" 1.0 0 -2674135 true "" "plot grp-op (1) (1)"
+"op3" 1.0 0 -6459832 true "" "plot grp-op (1) (2)"
+"op4" 1.0 0 -10899396 true "" "plot grp-op (1) (3)"
+"op5" 1.0 0 -11221820 true "" "plot grp-op (1) (4)"
+
+PLOT
+1533
+609
+1693
+822
+Opinion Grp 2
+NIL
+NIL
+0.0
+10.0
+0.0
+1.0
+true
+true
+"" ""
+PENS
+"op1" 1.0 0 -16777216 true "" "plot grp-op (2) (0)"
+"op2" 1.0 0 -2674135 true "" "plot grp-op (2) (1)"
+"op3" 1.0 0 -6459832 true "" "plot grp-op (2) (2)"
+"op4" 1.0 0 -10899396 true "" "plot grp-op (2) (3)"
+"op5" 1.0 0 -11221820 true "" "plot grp-op (2) (4)"
+
+PLOT
+1693
+609
+1853
+822
+Opinion Grp 3
+NIL
+NIL
+0.0
+10.0
+0.0
+1.0
+true
+true
+"" ""
+PENS
+"op1" 1.0 0 -16777216 true "" "plot grp-op (3) (0)"
+"op2" 1.0 0 -2674135 true "" "plot grp-op (3) (1)"
+"op3" 1.0 0 -6459832 true "" "plot grp-op (3) (2)"
+"op4" 1.0 0 -10899396 true "" "plot grp-op (3) (3)"
+"op5" 1.0 0 -11221820 true "" "plot grp-op (3) (4)"
 
 @#$#@#$#@
 ## This version 
