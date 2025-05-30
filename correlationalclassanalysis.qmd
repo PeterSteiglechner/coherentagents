@@ -6,6 +6,9 @@ format:
   html: 
     standalone: true
     embed-resources: true
+    code-fold: true
+execute: 
+  warning: false
 ---
 
 ## Data from the ESS
@@ -151,6 +154,14 @@ plot_evs("FR")
 plot_evs("PL")
 plot_evs("SE")
 ```
+
+
+
+```{r}
+E=R[[1]]
+eigen(E-diag(rep(1,5)))
+```
+
 
 
 
